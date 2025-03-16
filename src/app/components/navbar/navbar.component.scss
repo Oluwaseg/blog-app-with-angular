@@ -1,0 +1,12 @@
+.profile-transition {
+  transition: all 0.3s ease-in-out;
+}
+
+a,
+button {
+  transition: all 0.2s ease;
+}
+
+#profile-menu {
+  z-index: 50;
+}
