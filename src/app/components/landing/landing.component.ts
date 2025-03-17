@@ -18,6 +18,8 @@ export class LandingComponent {
         'Learn the basics of Angular and how to create your first application.',
       imageUrl: 'https://via.placeholder.com/600x400',
       date: 'March 15, 2025',
+      views: 1024,
+      category: 'Angular',
     },
     {
       id: 2,
@@ -26,6 +28,8 @@ export class LandingComponent {
         'Discover how to use Tailwind CSS to create beautiful, responsive designs.',
       imageUrl: 'https://via.placeholder.com/600x400',
       date: 'March 10, 2025',
+      views: 356,
+      category: 'CSS',
     },
     {
       id: 3,
@@ -34,6 +38,8 @@ export class LandingComponent {
         'Explore the latest trends in web development and what to expect in the coming year.',
       imageUrl: 'https://via.placeholder.com/600x400',
       date: 'March 5, 2025',
+      views: 512,
+      category: 'Web Development',
     },
   ];
 }

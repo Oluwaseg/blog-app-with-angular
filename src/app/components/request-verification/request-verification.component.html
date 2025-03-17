@@ -1,15 +1,15 @@
 <div
-  class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8"
+  class="min-h-screen bg-gray-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8"
 >
   <div class="sm:mx-auto sm:w-full sm:max-w-md">
-    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+    <h2 class="mt-6 text-center text-3xl font-extrabold text-white">
       Request Verification Email
     </h2>
-    <p class="mt-2 text-center text-sm text-gray-600">
+    <p class="mt-2 text-center text-sm text-gray-400">
       Or
       <a
         routerLink="/login"
-        class="font-medium text-blue-600 hover:text-blue-500"
+        class="font-medium text-blue-400 hover:text-blue-300 transition-colors duration-200"
       >
         go back to login
       </a>
@@ -17,7 +17,9 @@
   </div>
 
   <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-    <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+    <div
+      class="bg-gray-900 py-8 px-4 shadow-lg sm:rounded-lg sm:px-10 border border-gray-800"
+    >
       <form
         [formGroup]="verificationForm"
         (ngSubmit)="onSubmit()"
@@ -26,21 +28,49 @@
         <!-- Success Message -->
         <div
           *ngIf="successMessage"
-          class="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded"
+          class="mb-4 p-4 bg-green-900/30 border border-green-700 text-green-300 rounded-md flex items-start"
         >
-          {{ successMessage }}
+          <svg
+            class="h-5 w-5 text-green-400 mr-2 mt-0.5 flex-shrink-0"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span>{{ successMessage }}</span>
         </div>
 
         <!-- Error Message -->
         <div
           *ngIf="errorMessage"
-          class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded"
+          class="mb-4 p-4 bg-red-900/30 border border-red-700 text-red-300 rounded-md flex items-start"
         >
-          {{ errorMessage }}
+          <svg
+            class="h-5 w-5 text-red-400 mr-2 mt-0.5 flex-shrink-0"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span>{{ errorMessage }}</span>
         </div>
 
         <div>
-          <label for="email" class="block text-sm font-medium text-gray-700">
+          <label for="email" class="block text-sm font-medium text-gray-200">
             Email address
           </label>
           <div class="mt-1">
@@ -50,7 +80,8 @@
               type="email"
               formControlName="email"
               required
-              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              class="appearance-none block w-full px-3 py-2.5 border border-gray-700 bg-gray-800 rounded-md shadow-sm placeholder-gray-500 text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              placeholder="Enter your email address"
             />
           </div>
           <div
@@ -58,7 +89,7 @@
               verificationForm.get('email')?.invalid &&
               verificationForm.get('email')?.touched
             "
-            class="text-red-500 text-sm mt-1"
+            class="text-red-400 text-sm mt-1.5"
           >
             <div *ngIf="verificationForm.get('email')?.errors?.['required']">
               Email is required
@@ -73,7 +104,7 @@
           <button
             type="submit"
             [disabled]="verificationForm.invalid || isSubmitting"
-            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
           >
             <span *ngIf="isSubmitting" class="mr-2">
               <!-- Loading spinner -->

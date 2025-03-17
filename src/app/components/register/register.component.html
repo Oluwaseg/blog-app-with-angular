@@ -1,15 +1,15 @@
 <div
-  class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8"
+  class="min-h-screen bg-gray-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8"
 >
   <div class="sm:mx-auto sm:w-full sm:max-w-md">
-    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+    <h2 class="mt-6 text-center text-3xl font-extrabold text-white">
       Create your account
     </h2>
-    <p class="mt-2 text-center text-sm text-gray-600">
+    <p class="mt-2 text-center text-sm text-gray-400">
       Or
       <a
         routerLink="/login"
-        class="font-medium text-blue-600 hover:text-blue-500"
+        class="font-medium text-blue-400 hover:text-blue-300"
       >
         sign in to your account
       </a>
@@ -17,14 +17,16 @@
   </div>
 
   <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-    <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+    <div
+      class="bg-gray-900 py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-gray-800"
+    >
       <!-- Registration Success Message -->
       <div *ngIf="registrationComplete" class="text-center">
         <div
-          class="bg-green-100 p-3 rounded-full mx-auto w-16 h-16 flex items-center justify-center mb-4"
+          class="bg-green-900 p-3 rounded-full mx-auto w-16 h-16 flex items-center justify-center mb-4"
         >
           <svg
-            class="h-8 w-8 text-green-500"
+            class="h-8 w-8 text-green-400"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -38,10 +40,10 @@
             />
           </svg>
         </div>
-        <h3 class="text-xl font-bold text-green-600 mb-2">
+        <h3 class="text-xl font-bold text-green-400 mb-2">
           Registration Successful!
         </h3>
-        <p class="text-gray-600 mb-6">{{ successMessage }}</p>
+        <p class="text-gray-300 mb-6">{{ successMessage }}</p>
         <a
           routerLink="/login"
           class="inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -59,13 +61,13 @@
       >
         <div
           *ngIf="errorMessage"
-          class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded"
+          class="mb-4 p-3 bg-red-900 border border-red-700 text-red-200 rounded"
         >
           {{ errorMessage }}
         </div>
 
         <div>
-          <label for="name" class="block text-sm font-medium text-gray-700">
+          <label for="name" class="block text-sm font-medium text-gray-200">
             Full Name
           </label>
           <div class="mt-1">
@@ -75,7 +77,7 @@
               type="text"
               formControlName="name"
               required
-              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              class="appearance-none block w-full px-3 py-2 border border-gray-700 bg-gray-800 rounded-md shadow-sm placeholder-gray-400 text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             />
           </div>
           <div
@@ -83,7 +85,7 @@
               registerForm.get('name')?.invalid &&
               registerForm.get('name')?.touched
             "
-            class="text-red-500 text-sm mt-1"
+            class="text-red-400 text-sm mt-1"
           >
             <div *ngIf="registerForm.get('name')?.errors?.['required']">
               Name is required
@@ -95,7 +97,7 @@
         </div>
 
         <div>
-          <label for="email" class="block text-sm font-medium text-gray-700">
+          <label for="email" class="block text-sm font-medium text-gray-200">
             Email address
           </label>
           <div class="mt-1">
@@ -105,7 +107,7 @@
               type="email"
               formControlName="email"
               required
-              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              class="appearance-none block w-full px-3 py-2 border border-gray-700 bg-gray-800 rounded-md shadow-sm placeholder-gray-400 text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             />
           </div>
           <div
@@ -113,7 +115,7 @@
               registerForm.get('email')?.invalid &&
               registerForm.get('email')?.touched
             "
-            class="text-red-500 text-sm mt-1"
+            class="text-red-400 text-sm mt-1"
           >
             <div *ngIf="registerForm.get('email')?.errors?.['required']">
               Email is required
@@ -125,7 +127,7 @@
         </div>
 
         <div>
-          <label for="password" class="block text-sm font-medium text-gray-700">
+          <label for="password" class="block text-sm font-medium text-gray-200">
             Password
           </label>
           <div class="mt-1">
@@ -135,7 +137,7 @@
               type="password"
               formControlName="password"
               required
-              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              class="appearance-none block w-full px-3 py-2 border border-gray-700 bg-gray-800 rounded-md shadow-sm placeholder-gray-400 text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             />
           </div>
           <div
@@ -143,7 +145,7 @@
               registerForm.get('password')?.invalid &&
               registerForm.get('password')?.touched
             "
-            class="text-red-500 text-sm mt-1"
+            class="text-red-400 text-sm mt-1"
           >
             <div *ngIf="registerForm.get('password')?.errors?.['required']">
               Password is required
@@ -192,10 +194,12 @@
       <div *ngIf="!registrationComplete" class="mt-6">
         <div class="relative">
           <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-gray-300"></div>
+            <div class="w-full border-t border-gray-700"></div>
           </div>
           <div class="relative flex justify-center text-sm">
-            <span class="px-2 bg-white text-gray-500"> Or continue with </span>
+            <span class="px-2 bg-gray-900 text-gray-300">
+              Or continue with
+            </span>
           </div>
         </div>
 
@@ -203,7 +207,7 @@
           <button
             type="button"
             (click)="loginWithGoogle()"
-            class="w-full flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            class="w-full flex justify-center items-center py-2 px-4 border border-gray-700 rounded-md shadow-sm bg-gray-800 text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             <!-- Google Icon -->
             <svg
@@ -237,3 +241,6 @@
     </div>
   </div>
 </div>
+<footer class="text-white text-center py-4">
+  <p>&copy; 2025 BlogApp. All rights reserved.</p>
+</footer>

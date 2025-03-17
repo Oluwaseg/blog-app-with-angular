@@ -1,44 +1,51 @@
 <div
-  class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8"
+  class="min-h-screen bg-gray-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8"
 >
   <div class="sm:mx-auto sm:w-full sm:max-w-md">
-    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+    <h2 class="mt-6 text-center text-3xl font-extrabold text-white">
       Email Verification
     </h2>
   </div>
 
   <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-    <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 text-center">
+    <div
+      class="bg-gray-900 py-8 px-4 shadow-lg sm:rounded-lg sm:px-10 text-center border border-gray-800"
+    >
       <!-- Loading state -->
       <div *ngIf="isVerifying" class="flex flex-col items-center">
-        <svg
-          class="animate-spin h-12 w-12 text-blue-500 mb-4"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            class="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            stroke-width="4"
-          ></circle>
-          <path
-            class="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          ></path>
-        </svg>
-        <p class="text-lg">Verifying your email address...</p>
+        <div class="relative w-20 h-20 mb-6">
+          <svg
+            class="animate-spin h-20 w-20 text-blue-500"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+        </div>
+        <p class="text-lg text-white">Verifying your email address...</p>
+        <p class="text-gray-400 mt-2">This will only take a moment</p>
       </div>
 
       <!-- Success state -->
       <div *ngIf="!isVerifying && isSuccess" class="flex flex-col items-center">
-        <div class="bg-green-100 p-3 rounded-full mb-4">
+        <div
+          class="bg-green-900/30 p-4 rounded-full mb-6 w-20 h-20 flex items-center justify-center"
+        >
           <svg
-            class="h-12 w-12 text-green-500"
+            class="h-12 w-12 text-green-400"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -52,13 +59,23 @@
             />
           </svg>
         </div>
-        <h3 class="text-xl font-bold text-green-600 mb-2">
+        <h3 class="text-xl font-bold text-green-400 mb-3">
           Email Verified Successfully!
         </h3>
-        <p class="text-gray-600 mb-4">
+        <p class="text-gray-300 mb-4">
           Your email has been verified. You can now log in to your account.
         </p>
-        <p class="text-gray-500">Redirecting to login page...</p>
+        <div class="w-full max-w-xs bg-gray-800 rounded-md p-3 mt-2">
+          <p class="text-gray-400">Redirecting to login page...</p>
+          <div
+            class="w-full bg-gray-700 h-1.5 rounded-full mt-2 overflow-hidden"
+          >
+            <div
+              class="bg-blue-500 h-full rounded-full animate-pulse"
+              style="width: 100%"
+            ></div>
+          </div>
+        </div>
       </div>
 
       <!-- Error state -->
@@ -66,9 +83,11 @@
         *ngIf="!isVerifying && !isSuccess && errorMessage"
         class="flex flex-col items-center"
       >
-        <div class="bg-red-100 p-3 rounded-full mb-4">
+        <div
+          class="bg-red-900/30 p-4 rounded-full mb-6 w-20 h-20 flex items-center justify-center"
+        >
           <svg
-            class="h-12 w-12 text-red-500"
+            class="h-12 w-12 text-red-400"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -82,12 +101,26 @@
             />
           </svg>
         </div>
-        <h3 class="text-xl font-bold text-red-600 mb-2">Verification Failed</h3>
-        <p class="text-gray-600 mb-4">{{ errorMessage }}</p>
+        <h3 class="text-xl font-bold text-red-400 mb-3">Verification Failed</h3>
+        <p class="text-gray-300 mb-6">{{ errorMessage }}</p>
         <a
           routerLink="/request-verification"
-          class="text-blue-600 hover:text-blue-800 font-medium"
+          class="inline-flex items-center justify-center px-5 py-2.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-blue-500 transition-colors duration-200"
         >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 mr-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+            />
+          </svg>
           Request a new verification email
         </a>
       </div>

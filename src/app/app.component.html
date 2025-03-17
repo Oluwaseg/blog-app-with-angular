@@ -1,9 +1,6 @@
-<div class="min-h-screen flex flex-col bg-gray-800">
-  <app-navbar></app-navbar>
+<div class="min-h-screen flex flex-col bg-gray-950">
+  <app-navbar *ngIf="!isAuthPage"></app-navbar>
   <main class="flex-grow">
     <router-outlet></router-outlet>
   </main>
-  <footer class="bg-gray-800 text-white text-center py-4">
-    <p>&copy; 2025 BlogApp. All rights reserved.</p>
-  </footer>
 </div>

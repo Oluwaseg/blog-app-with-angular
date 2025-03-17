@@ -52,19 +52,19 @@ export class HomeComponent implements OnInit {
     {
       id: 1,
       name: 'Alice Johnson',
-      avatar: 'https://via.placeholder.com/50',
+      image: 'https://via.placeholder.com/50',
       posts: 24,
     },
     {
       id: 2,
       name: 'Bob Smith',
-      avatar: 'https://via.placeholder.com/50',
+      image: 'https://via.placeholder.com/50',
       posts: 18,
     },
     {
       id: 3,
       name: 'Carol Davis',
-      avatar: 'https://via.placeholder.com/50',
+      image: 'https://via.placeholder.com/50',
       posts: 32,
     },
   ];
