@@ -21,20 +21,15 @@ export class OAuthCallbackComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Get token from URL query params
     const token = this.route.snapshot.queryParamMap.get('token');
-
-    // Check if there's an error parameter
     const error = this.route.snapshot.queryParamMap.get('error');
 
     if (error) {
       this.isLoading = false;
       this.errorMessage = decodeURIComponent(error);
     } else if (token) {
-      // Process the token
       this.authService.handleOAuthToken(token).subscribe({
         next: () => {
-          // Redirect to home page after successful authentication
           this.router.navigate(['/home']);
         },
         error: (err) => {
@@ -44,7 +39,6 @@ export class OAuthCallbackComponent implements OnInit {
         },
       });
     } else {
-      // No token or error in URL
       this.isLoading = false;
       this.errorMessage = 'No authentication token received. Please try again.';
     }

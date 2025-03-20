@@ -36,7 +36,6 @@ export class LoginComponent {
       rememberMe: [false],
     });
 
-    // Get return url from route parameters or default to '/home'
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/home';
   }
 
@@ -57,20 +56,17 @@ export class LoginComponent {
     this.authService.login(loginData).subscribe({
       next: (response) => {
         this.isSubmitting = false;
-        // Navigate to the return url
         this.router.navigateByUrl(this.returnUrl);
       },
       error: (error) => {
         this.isSubmitting = false;
 
-        // Check if the error is due to unverified email
         if (error.error?.code === 'EMAIL_NOT_VERIFIED') {
           this.isEmailNotVerified = true;
           this.unverifiedEmail = this.loginForm.value.email;
           this.errorMessage =
             'Your email has not been verified. Please verify your email to continue.';
         } else {
-          // Handle other errors
           this.errorMessage =
             error.error?.message ||
             'Login failed. Please check your credentials.';

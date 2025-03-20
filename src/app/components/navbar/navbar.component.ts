@@ -40,7 +40,6 @@ export class NavbarComponent implements OnInit {
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
   }
 
-  // Close profile menu when clicking outside
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const profileMenuTrigger = document.getElementById('profile-menu-trigger');
@@ -56,7 +55,6 @@ export class NavbarComponent implements OnInit {
     }
   }
 
-  // Get user avatar
   getUserAvatar(): string {
     if (this.currentUser?.image) {
       return this.currentUser.image;

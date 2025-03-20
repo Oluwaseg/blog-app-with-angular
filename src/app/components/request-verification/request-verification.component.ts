@@ -33,7 +33,6 @@ export class RequestVerificationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Get email from query params if available
     const email = this.route.snapshot.queryParamMap.get('email');
     if (email) {
       this.verificationForm.patchValue({ email });

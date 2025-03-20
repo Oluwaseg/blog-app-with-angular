@@ -22,7 +22,6 @@ export class VerifyEmailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Get token from URL query params
     const token = this.route.snapshot.queryParamMap.get('token');
 
     if (token) {
@@ -38,8 +37,6 @@ export class VerifyEmailComponent implements OnInit {
       next: (response) => {
         this.isVerifying = false;
         this.isSuccess = true;
-
-        // Redirect to login page after 3 seconds
         setTimeout(() => {
           this.router.navigate(['/login']);
         }, 3000);

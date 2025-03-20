@@ -40,7 +40,6 @@ export class ResetPasswordComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Get token from URL query params
     this.token = this.route.snapshot.queryParamMap.get('token') || '';
 
     if (!this.token) {
@@ -79,7 +78,6 @@ export class ResetPasswordComponent implements OnInit {
     });
   }
 
-  // Custom validator to check if password and confirm password match
   passwordMatchValidator(formGroup: FormGroup) {
     const password = formGroup.get('password')?.value;
     const confirmPassword = formGroup.get('confirmPassword')?.value;
