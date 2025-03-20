@@ -1,0 +1,309 @@
+<div class="min-h-screen bg-gray-950 text-white py-12 px-4 sm:px-6">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header with gradient border -->
+    <div class="relative mb-10">
+      <div
+        class="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-400 rounded-lg opacity-50 blur-xl"
+      ></div>
+      <div
+        class="relative bg-gray-900 rounded-lg p-8 border border-gray-800 shadow-xl"
+      >
+        <h1
+          class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-300"
+        >
+          Create New Blog Post
+        </h1>
+        <p class="text-gray-400 mt-2">Share your knowledge with the world</p>
+      </div>
+    </div>
+
+    <!-- Error message -->
+    <div
+      *ngIf="error"
+      class="bg-red-900/40 border border-red-700 text-red-200 px-6 py-4 rounded-lg mb-8 flex items-start"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-6 w-6 mr-3 mt-0.5 text-red-400 flex-shrink-0"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+        />
+      </svg>
+      <span>{{ error }}</span>
+    </div>
+
+    <!-- Main form -->
+    <form (ngSubmit)="submitBlog()" class="space-y-8">
+      <!-- Two-column layout for title and category -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Title (takes 2/3 of space) -->
+        <div class="md:col-span-2 space-y-2">
+          <label for="title" class="block text-gray-300 font-medium"
+            >Title</label
+          >
+          <div class="relative group">
+            <input
+              type="text"
+              id="title"
+              name="title"
+              [(ngModel)]="blog.title"
+              class="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white transition-all duration-200"
+              placeholder="Enter an attention-grabbing title"
+              required
+            />
+            <div
+              class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-600/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Category (takes 1/3 of space) -->
+        <div class="space-y-2">
+          <label for="category" class="block text-gray-300 font-medium"
+            >Category</label
+          >
+          <div class="relative">
+            <select
+              id="category"
+              name="category"
+              [(ngModel)]="blog.category"
+              class="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white appearance-none transition-all duration-200"
+              required
+            >
+              <option *ngFor="let category of categories" [value]="category">
+                {{ category }}
+              </option>
+            </select>
+            <div
+              class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="space-y-2">
+        <label for="description" class="block text-gray-300 font-medium"
+          >Description</label
+        >
+        <div class="relative group">
+          <textarea
+            id="description"
+            name="description"
+            [(ngModel)]="blog.description"
+            rows="3"
+            class="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white transition-all duration-200"
+            placeholder="Write a compelling description that summarizes your post"
+            required
+          ></textarea>
+          <div
+            class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-600/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+          ></div>
+        </div>
+        <p class="text-sm text-gray-500">
+          This will appear in search results and post previews
+        </p>
+      </div>
+
+      <!-- Content -->
+      <div class="space-y-2">
+        <label for="content" class="block text-gray-300 font-medium"
+          >Content</label
+        >
+        <div class="relative group">
+          <textarea
+            id="content"
+            name="content"
+            [(ngModel)]="blog.content"
+            rows="12"
+            class="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white transition-all duration-200"
+            placeholder="Write your blog content here..."
+            required
+          ></textarea>
+          <div
+            class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-600/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+          ></div>
+        </div>
+        <p class="text-sm text-gray-500">HTML formatting is supported</p>
+      </div>
+
+      <!-- Tags -->
+      <div class="space-y-2">
+        <label for="tags" class="block text-gray-300 font-medium">Tags</label>
+        <div class="relative group">
+          <input
+            type="text"
+            id="tags"
+            name="tags"
+            [(ngModel)]="blog.tags"
+            class="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white transition-all duration-200"
+            placeholder="tech, tutorial, javascript, web-development"
+            required
+          />
+          <div
+            class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-600/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+          ></div>
+        </div>
+        <p class="text-sm text-gray-500">Separate tags with commas</p>
+      </div>
+
+      <!-- Image Upload - Redesigned -->
+      <div class="space-y-4">
+        <label class="block text-gray-300 font-medium">Featured Image</label>
+
+        <!-- No image selected state -->
+        <div
+          *ngIf="!imagePreview"
+          class="border-2 border-dashed border-gray-700 rounded-lg p-8 text-center transition-all duration-300 hover:border-blue-500 hover:bg-gray-900/50 group"
+        >
+          <input
+            type="file"
+            id="image"
+            (change)="onFileSelected($event)"
+            accept="image/*"
+            class="hidden"
+            #fileInput
+          />
+          <div class="flex flex-col items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-16 w-16 text-gray-600 group-hover:text-blue-500 transition-colors duration-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            <button
+              type="button"
+              (click)="fileInput.click()"
+              class="mt-4 px-6 py-3 bg-gray-800 hover:bg-blue-600 text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-105"
+            >
+              Choose Image
+            </button>
+            <p class="text-sm text-gray-500 mt-3">
+              Recommended size: 1200 x 600 pixels
+            </p>
+          </div>
+        </div>
+
+        <!-- Image preview state -->
+        <div
+          *ngIf="imagePreview"
+          class="relative rounded-lg overflow-hidden group"
+        >
+          <div
+            class="aspect-video w-full bg-gray-900 flex items-center justify-center"
+          >
+            <img
+              [src]="imagePreview"
+              alt="Preview"
+              class="w-full h-full object-cover"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-gray-950/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            ></div>
+          </div>
+
+          <!-- Image controls -->
+          <div
+            class="absolute bottom-0 inset-x-0 p-4 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          >
+            <span
+              class="text-sm text-gray-300 bg-gray-900/80 px-3 py-1 rounded-full"
+              >Featured Image</span
+            >
+            <button
+              type="button"
+              (click)="removeImage()"
+              class="bg-red-600 hover:bg-red-700 text-white rounded-full p-2 transition-all duration-300 transform hover:scale-110"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-end space-x-4 pt-6 border-t border-gray-800">
+        <button
+          type="button"
+          routerLink="/blogs"
+          class="px-6 py-3 bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium rounded-lg transition-all duration-300"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          [disabled]="isSubmitting"
+          class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-medium rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 disabled:hover:scale-100"
+        >
+          <span *ngIf="isSubmitting" class="flex items-center">
+            <svg
+              class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            Publishing...
+          </span>
+          <span *ngIf="!isSubmitting">Publish Post</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

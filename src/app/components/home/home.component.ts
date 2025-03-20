@@ -1,52 +1,21 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { AuthService, User } from '../../services/auth.service';
+import { Blog, BlogResponse, BlogService } from '../../services/blog.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
   user: User | null = null;
-
-  posts = [
-    {
-      id: 1,
-      title: 'Getting Started with Angular',
-      content:
-        'Angular is a platform for building mobile and desktop web applications. Join the community of millions of developers who build compelling user interfaces with Angular.',
-      author: 'Jane Smith',
-      date: 'March 15, 2025',
-      likes: 42,
-      comments: 12,
-      imageUrl: 'https://via.placeholder.com/800x400',
-    },
-    {
-      id: 2,
-      title: 'Mastering Tailwind CSS',
-      content:
-        'Tailwind CSS is a utility-first CSS framework packed with classes like flex, pt-4, text-center and rotate-90 that can be composed to build any design, directly in your markup.',
-      author: 'Mike Johnson',
-      date: 'March 10, 2025',
-      likes: 38,
-      comments: 8,
-      imageUrl: 'https://via.placeholder.com/800x400',
-    },
-    {
-      id: 3,
-      title: 'Web Development Trends 2025',
-      content:
-        "Stay ahead of the curve with the latest web development trends. From AI-powered tools to new frameworks, discover what's shaping the future of web development.",
-      author: 'Sarah Williams',
-      date: 'March 5, 2025',
-      likes: 56,
-      comments: 15,
-      imageUrl: 'https://via.placeholder.com/800x400',
-    },
-  ];
+  blogs: Blog[] = [];
+  isLoading = true;
+  error: string | null = null;
 
   suggestedUsers = [
     {
@@ -78,16 +47,72 @@ export class HomeComponent implements OnInit {
     'Frontend',
   ];
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private blogService: BlogService
+  ) {}
 
   ngOnInit(): void {
-    // Subscribe to the current user observable
     this.authService.currentUser$.subscribe((user) => {
       this.user = user;
     });
+    this.loadBlogs();
+  }
+
+  loadBlogs(): void {
+    this.isLoading = true;
+    this.blogService.getAllBlogs().subscribe({
+      next: (response: BlogResponse) => {
+        this.blogs = response.data.blogs;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.error = 'Failed to load blogs. Please try again later.';
+        this.isLoading = false;
+        console.error('Error loading blogs:', err);
+      },
+    });
+  }
+
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  }
+
+  truncateText(text: string, maxLength: number): string {
+    return text.length > maxLength
+      ? text.substring(0, maxLength) + '...'
+      : text;
   }
 
   logout(): void {
     this.authService.logout();
+  }
+
+  reactToBlog(blog: Blog, reactionType: 'likes' | 'dislikes'): void {
+    this.blogService.addReactionToBlog(blog.slug, { reactionType }).subscribe({
+      next: (response) => {
+        const index = this.blogs.findIndex((b) => b._id === blog._id);
+        if (index !== -1) {
+          this.blogs[index].reactions.likes = Array(
+            response.data.likesCount
+          ).fill('');
+          this.blogs[index].reactions.dislikes = Array(
+            response.data.dislikesCount
+          ).fill('');
+        }
+      },
+      error: (err) => {
+        console.error('Error reacting to blog:', err);
+      },
+    });
+  }
+
+  getCurrentUserId(): string | undefined {
+    return this.authService.getCurrentUserId();
   }
 }

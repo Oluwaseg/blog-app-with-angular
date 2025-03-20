@@ -1,4 +1,9 @@
 import { Routes } from '@angular/router';
+import { BlogCategoryComponent } from './components/blog/blog-category/blog-category.component';
+import { BlogCreateComponent } from './components/blog/blog-create/blog-create.component';
+import { BlogDetailComponent } from './components/blog/blog-detail/blog-detail.component';
+import { BlogEditComponent } from './components/blog/blog-edit/blog-edit.component';
+import { BlogListComponent } from './components/blog/blog-list/blog-list.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { HomeComponent } from './components/home/home.component';
 import { LandingComponent } from './components/landing/landing.component';
@@ -22,7 +27,29 @@ export const routes: Routes = [
   {
     path: 'home',
     component: HomeComponent,
-    canActivate: [AuthGuard], // Protect this route
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'blogs',
+    component: BlogListComponent,
+  },
+  {
+    path: 'blogs/category',
+    component: BlogCategoryComponent,
+  },
+  {
+    path: 'blogs/create',
+    component: BlogCreateComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'blogs/:slug',
+    component: BlogDetailComponent,
+  },
+  {
+    path: 'blogs/:slug/edit',
+    component: BlogEditComponent,
+    canActivate: [AuthGuard],
   },
   { path: '**', redirectTo: '' },
 ];

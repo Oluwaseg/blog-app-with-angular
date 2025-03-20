@@ -64,6 +64,14 @@ export class AuthService {
     this.loadUser();
   }
 
+  public getCurrentUserId(): string {
+    return this.currentUserSubject.value?.id?.toString() || '';
+  }
+
+  getCurrentUser(): User | null {
+    return this.currentUserSubject.value;
+  }
+
   register(userData: RegisterRequest): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(
       `${this.apiUrl}/api/register`,
@@ -178,6 +186,7 @@ export class AuthService {
     if (userJson) {
       const user = JSON.parse(userJson) as User;
       this.currentUserSubject.next(user);
+      this.isAuthenticatedSubject.next(true);
     }
   }
 }

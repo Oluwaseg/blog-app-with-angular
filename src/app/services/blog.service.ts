@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export interface Blog {
@@ -9,8 +10,13 @@ export interface Blog {
   slug: string;
   description: string;
   content: string;
-  author: any;
-  createdAt: Date;
+  author: {
+    _id: string;
+    name: string;
+    username: string;
+    image?: string;
+  };
+  createdAt: string;
   comments: Comment[];
   reactions: {
     likes: string[];
@@ -24,8 +30,13 @@ export interface Blog {
 export interface Comment {
   _id: string;
   content: string;
-  author: any;
-  createdAt: Date;
+  author: {
+    _id: string;
+    name: string;
+    image?: string;
+  };
+  createdAt: string;
+  formattedTime?: string;
   reactions: {
     likes: string[];
     dislikes: string[];
@@ -37,16 +48,42 @@ export interface BlogsByCategory {
   [category: string]: Blog[];
 }
 
+export interface BlogResponse {
+  success: boolean;
+  data: {
+    blogs: Blog[];
+    randomBlogByCategory: BlogsByCategory;
+    blogsByCategory: BlogsByCategory;
+  };
+}
+
+export interface SingleBlogResponse {
+  success: boolean;
+  data: {
+    blog: Blog;
+    isOwner: boolean;
+    commentCount: number;
+    relatedBlog: Blog[];
+    randomBlogByCategory: BlogsByCategory;
+    displayedReplies: number;
+  };
+}
+
+export interface CreateBlogRequest {
+  title: string;
+  description: string;
+  content: string;
+  category: string;
+  tags: string;
+  image?: File;
+}
+
 export interface CommentRequest {
   content: string;
 }
 
-export interface ReplyRequest {
-  content: string;
-}
-
 export interface ReactionRequest {
-  type: 'like' | 'dislike';
+  reactionType: 'likes' | 'dislikes';
 }
 
 @Injectable({
@@ -57,159 +94,135 @@ export class BlogService {
 
   constructor(private http: HttpClient) {}
 
-  // Get all blogs
-  getAllBlogs(): Observable<{
-    success: boolean;
-    data: {
-      blogs: Blog[];
-      randomBlogByCategory: any;
-      blogsByCategory: BlogsByCategory;
-    };
-  }> {
-    return this.http.get<{
-      success: boolean;
-      data: {
-        blogs: Blog[];
-        randomBlogByCategory: any;
-        blogsByCategory: BlogsByCategory;
-      };
-    }>(`${this.apiUrl}/api/blogs`);
+  getAllBlogs(): Observable<BlogResponse> {
+    return this.http.get<BlogResponse>(`${this.apiUrl}/api/blogs`);
   }
 
-  // Get blogs grouped by category
-  getBlogsByCategory(): Observable<{
-    success: boolean;
-    data: { blogsByCategory: BlogsByCategory };
-  }> {
-    return this.http.get<{
-      success: boolean;
-      data: { blogsByCategory: BlogsByCategory };
-    }>(`${this.apiUrl}/api/blogs/categories`);
+  getBlogsByCategory(): Observable<{ blogsByCategory: BlogsByCategory }> {
+    return this.http.get<{ blogsByCategory: BlogsByCategory }>(
+      `${this.apiUrl}/api/blogs/categories`
+    );
   }
 
-  // Get blog by slug
-  getBlogBySlug(slug: string): Observable<{
-    success: boolean;
-    data: {
-      blog: Blog;
-      isOwner: boolean;
-      commentCount: number;
-      relatedBlog: Blog[];
-      randomBlogByCategory: any;
-      displayedReplies: number;
-    };
-  }> {
-    return this.http.get<{
-      success: boolean;
-      data: {
-        blog: Blog;
-        isOwner: boolean;
-        commentCount: number;
-        relatedBlog: Blog[];
-        randomBlogByCategory: any;
-        displayedReplies: number;
-      };
-    }>(`${this.apiUrl}/api/blogs/${slug}`);
+  getBlogBySlug(slug: string): Observable<SingleBlogResponse> {
+    return this.http.get<SingleBlogResponse>(
+      `${this.apiUrl}/api/blogs/${slug}`
+    );
   }
 
-  // Create new blog
+  getBlogForEdit(slug: string): Observable<{ success: boolean; data: Blog }> {
+    return this.http.get<{ success: boolean; data: Blog }>(
+      `${this.apiUrl}/api/blogs/${slug}/edit`
+    );
+  }
+
   createBlog(
-    blogData: FormData
+    blogData: CreateBlogRequest
   ): Observable<{ success: boolean; message: string; data: Blog }> {
+    const formData = new FormData();
+    formData.append('title', blogData.title);
+    formData.append('description', blogData.description);
+    formData.append('content', blogData.content);
+    formData.append('category', blogData.category);
+    formData.append('tags', blogData.tags);
+
+    if (blogData.image) {
+      formData.append('image', blogData.image);
+    }
+
     return this.http.post<{ success: boolean; message: string; data: Blog }>(
       `${this.apiUrl}/api/blogs/create`,
-      blogData
+      formData
     );
   }
 
-  // Update blog
-  updateBlog(slug: string, blogData: FormData): Observable<Blog> {
-    return this.http.put<Blog>(
-      `${this.apiUrl}/api/blogs/${slug}/edit`,
-      blogData
-    );
+  updateBlog(
+    slug: string,
+    blogData: Partial<CreateBlogRequest & { removeImage: boolean }>
+  ): Observable<{ success: boolean; message: string; data: Blog }> {
+    const formData = new FormData();
+    formData.append('title', blogData.title || '');
+    formData.append('description', blogData.description || '');
+    formData.append('content', blogData.content || '');
+    formData.append('category', blogData.category || '');
+    formData.append('removeImage', blogData.removeImage ? 'true' : 'false');
+
+    if (blogData.tags) {
+      const cleanTags = blogData.tags
+        .replace(/[[\]"]/g, '')
+        .split(',')
+        .map((tag) => tag.trim())
+        .filter((tag) => tag)
+        .join(',');
+      formData.append('tags', cleanTags);
+    }
+
+    if (blogData.image) {
+      formData.append('image', blogData.image);
+    }
+
+    return this.http
+      .put<{ success: boolean; message: string; data: Blog }>(
+        `${this.apiUrl}/api/blogs/${slug}/edit`,
+        formData
+      )
+      .pipe(
+        tap({
+          next: (response) => {
+            console.log('Update successful:', response);
+          },
+          error: (error) => {
+            console.error('Update failed:', error);
+          },
+        })
+      );
   }
 
-  // Delete blog
-  deleteBlog(id: string): Observable<{ message: string }> {
-    return this.http.delete<{ message: string }>(
+  deleteBlog(id: string): Observable<{ success: boolean; message: string }> {
+    return this.http.delete<{ success: boolean; message: string }>(
       `${this.apiUrl}/api/blogs/${id}`
     );
   }
 
-  // Get blog for editing
-  getBlogForEdit(slug: string): Observable<Blog> {
-    return this.http.get<Blog>(`${this.apiUrl}/api/blogs/${slug}/edit`);
-  }
-
-  // Add comment to blog
-  addComment(blogId: string, comment: CommentRequest): Observable<Comment> {
-    return this.http.post<Comment>(
+  addComment(
+    blogId: string,
+    comment: CommentRequest
+  ): Observable<{ success: boolean; message: string; data: any }> {
+    return this.http.post<{ success: boolean; message: string; data: any }>(
       `${this.apiUrl}/api/blogs/${blogId}/comment`,
       comment
     );
   }
 
-  // Delete comment
-  deleteComment(commentId: string): Observable<{ message: string }> {
-    return this.http.delete<{ message: string }>(
-      `${this.apiUrl}/api/blogs/comment/${commentId}`
-    );
-  }
-
-  // Edit comment
-  editComment(commentId: string, content: string): Observable<Comment> {
-    return this.http.post<Comment>(
+  editComment(
+    commentId: string,
+    content: string
+  ): Observable<{ success: boolean; message: string; data: any }> {
+    return this.http.post<{ success: boolean; message: string; data: any }>(
       `${this.apiUrl}/api/blogs/${commentId}/edit`,
       { content }
     );
   }
 
-  // Get comment for editing
-  getEditComment(commentId: string): Observable<Comment> {
-    return this.http.get<Comment>(
+  getEditComment(
+    commentId: string
+  ): Observable<{ success: boolean; data: any }> {
+    return this.http.get<{ success: boolean; data: any }>(
       `${this.apiUrl}/api/blogs/edit-comment/${commentId}`
     );
   }
 
-  // Reply to comment
-  replyToComment(commentId: string, reply: ReplyRequest): Observable<Comment> {
-    return this.http.post<Comment>(
-      `${this.apiUrl}/api/blogs/comment/${commentId}/reply`,
-      reply
+  deleteComment(
+    commentId: string
+  ): Observable<{ success: boolean; message: string; data: any }> {
+    return this.http.delete<{ success: boolean; message: string; data: any }>(
+      `${this.apiUrl}/api/blogs/comment/${commentId}`
     );
   }
 
-  // Delete reply
-  deleteReply(
-    slug: string,
-    commentId: string,
-    replyId: string
-  ): Observable<{ message: string }> {
-    return this.http.delete<{ message: string }>(
-      `${this.apiUrl}/api/blogs/${slug}/comment/${commentId}/delete-reply/${replyId}`
-    );
-  }
-
-  // Edit reply
-  editReply(
-    slug: string,
-    commentId: string,
-    replyId: string,
-    content: string
-  ): Observable<Comment> {
-    return this.http.post<Comment>(
-      `${this.apiUrl}/api/blogs/${slug}/comment/${commentId}/edit-reply/${replyId}`,
-      {
-        content,
-      }
-    );
-  }
-
-  // Add reaction to blog
   addReactionToBlog(
     slug: string,
-    reaction: { reactionType: 'likes' | 'dislikes' }
+    reaction: ReactionRequest
   ): Observable<{
     success: boolean;
     data: {
@@ -230,11 +243,10 @@ export class BlogService {
     }>(`${this.apiUrl}/api/blogs/${slug}/react`, reaction);
   }
 
-  // Add reaction to comment
   addReactionToComment(
     slug: string,
     commentId: string,
-    reaction: { reactionType: 'likes' | 'dislikes' }
+    reaction: ReactionRequest
   ): Observable<{
     success: boolean;
     data: {
@@ -255,5 +267,74 @@ export class BlogService {
         dislikesComment: number;
       };
     }>(`${this.apiUrl}/api/blogs/${slug}/comment/${commentId}/react`, reaction);
+  }
+
+  replyToComment(
+    commentId: string,
+    content: string
+  ): Observable<{ success: boolean; message: string; data: any }> {
+    return this.http.post<{ success: boolean; message: string; data: any }>(
+      `${this.apiUrl}/api/blogs/comment/${commentId}/reply`,
+      { content }
+    );
+  }
+
+  updateReply(
+    slug: string,
+    commentId: string,
+    replyId: string,
+    content: string
+  ): Observable<{ success: boolean; message: string; data: any }> {
+    return this.http.post<{ success: boolean; message: string; data: any }>(
+      `${this.apiUrl}/api/blogs/${slug}/comment/${commentId}/edit-reply/${replyId}`,
+      { content }
+    );
+  }
+
+  deleteReply(
+    slug: string,
+    commentId: string,
+    replyId: string
+  ): Observable<{ success: boolean; message: string; data: any }> {
+    return this.http.delete<{ success: boolean; message: string; data: any }>(
+      `${this.apiUrl}/api/blogs/${slug}/comment/${commentId}/delete-reply/${replyId}`
+    );
+  }
+
+  addReactionToReply(
+    replyId: string,
+    reaction: ReactionRequest
+  ): Observable<{
+    success: boolean;
+    data: {
+      replyId: string;
+      likedReply: boolean;
+      dislikedReply: boolean;
+      likesReply: number;
+      dislikesReply: number;
+      blogSlug: string;
+    };
+  }> {
+    return this.http.post<{
+      success: boolean;
+      data: {
+        replyId: string;
+        likedReply: boolean;
+        dislikedReply: boolean;
+        likesReply: number;
+        dislikesReply: number;
+        blogSlug: string;
+      };
+    }>(`${this.apiUrl}/api/blogs/reply/${replyId}/react`, reaction);
+  }
+
+  getEditReply(
+    slug: string,
+    commentId: string,
+    replyId: string
+  ): Observable<{ success: boolean; data: any }> {
+    return this.http.get<{ success: boolean; data: any }>(
+      `${this.apiUrl}/api/blogs/${slug}/comment/${commentId}/edit-reply/${replyId}`
+    );
   }
 }

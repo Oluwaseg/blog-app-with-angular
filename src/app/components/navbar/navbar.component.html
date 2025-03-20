@@ -16,17 +16,17 @@
 
         <!-- Desktop Navigation Links -->
         <div class="hidden md:ml-10 md:flex md:space-x-8">
-          <a
+          <!-- <a
             routerLink="/"
             routerLinkActive="text-blue-400 border-blue-400"
             [routerLinkActiveOptions]="{ exact: true }"
             class="border-transparent text-gray-300 hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors duration-200"
           >
             Home
-          </a>
+          </a> -->
 
           <a
-            routerLink="/blog"
+            routerLink="/blogs"
             routerLinkActive="text-blue-400 border-blue-400"
             class="border-transparent text-gray-300 hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors duration-200"
           >
@@ -34,7 +34,7 @@
           </a>
 
           <a
-            routerLink="/categories"
+            routerLink="/blogs/category"
             routerLinkActive="text-blue-400 border-blue-400"
             class="border-transparent text-gray-300 hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors duration-200"
           >
@@ -51,7 +51,7 @@
 
           <ng-container *ngIf="isAuthenticated">
             <a
-              routerLink="/dashboard"
+              routerLink="/home"
               routerLinkActive="text-blue-400 border-blue-400"
               class="border-transparent text-gray-300 hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors duration-200"
             >

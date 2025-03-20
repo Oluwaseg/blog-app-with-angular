@@ -1,0 +1,164 @@
+<div class="container mx-auto px-4 py-8 bg-gray-950 text-white">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold text-white">Blog Posts</h1>
+    <div *ngIf="isAuthenticated">
+      <a
+        routerLink="/blogs/create"
+        class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-5 rounded-lg transition-all duration-300 flex items-center gap-2 shadow-lg shadow-blue-500/20 hover:shadow-blue-600/30"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 4v16m8-8H4"
+          />
+        </svg>
+        Create New Post
+      </a>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="flex justify-center items-center py-12">
+    <div
+      class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-400"
+    ></div>
+  </div>
+
+  <div
+    *ngIf="error"
+    class="bg-red-900/30 backdrop-blur-sm border border-red-800/50 text-red-200 px-4 py-3 rounded-lg mb-4 shadow-lg"
+  >
+    {{ error }}
+  </div>
+
+  <div *ngIf="!isLoading && blogs.length === 0" class="text-center py-12">
+    <p class="text-xl text-gray-400">No blog posts found.</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div
+      *ngFor="let blog of blogs"
+      class="group bg-gradient-to-br from-gray-900 to-gray-950 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-800/50 hover:border-blue-700/30 relative"
+    >
+      <!-- Image Container with Gradient Overlay -->
+      <div class="relative h-56 overflow-hidden">
+        <div
+          *ngIf="blog.image"
+          class="absolute inset-0 transform group-hover:scale-105 transition-transform duration-700 ease-in-out"
+        >
+          <img
+            [src]="blog.image"
+            [alt]="blog.title"
+            class="w-full h-full object-cover"
+          />
+          <div
+            class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/70 to-transparent opacity-80"
+          ></div>
+        </div>
+        <div
+          *ngIf="!blog.image"
+          class="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-16 w-16 text-gray-700"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1"
+              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
+          </svg>
+        </div>
+
+        <!-- Category Badge -->
+        <span
+          class="absolute top-4 left-4 bg-blue-600/80 backdrop-blur-sm text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-lg"
+          >{{ blog.category }}</span
+        >
+
+        <!-- Date Badge -->
+        <span
+          class="absolute top-4 right-4 bg-gray-800/80 backdrop-blur-sm text-gray-300 text-xs px-3 py-1.5 rounded-full shadow-lg"
+        >
+          {{ formatDate(blog.createdAt) }}
+        </span>
+      </div>
+
+      <!-- Content -->
+      <div class="p-6 relative z-10">
+        <h2
+          class="text-xl font-bold mb-3 text-white group-hover:text-blue-300 transition-colors duration-300"
+        >
+          {{ blog.title }}
+        </h2>
+        <p class="text-gray-300 mb-5 line-clamp-3">
+          {{ truncateText(blog.description, 120) }}
+        </p>
+
+        <!-- Author and Read More -->
+        <div
+          class="flex items-center justify-between pt-4 border-t border-gray-800/50"
+        >
+          <div class="flex items-center">
+            <div
+              *ngIf="blog.author.image"
+              class="w-10 h-10 rounded-full overflow-hidden mr-3 ring-2 ring-gray-800 group-hover:ring-blue-600 transition-all duration-300"
+            >
+              <img
+                [src]="blog.author.image"
+                [alt]="blog.author.name"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div
+              *ngIf="!blog.author.image"
+              class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-900 to-blue-700 flex items-center justify-center mr-3 ring-2 ring-gray-800 group-hover:ring-blue-600 transition-all duration-300"
+            >
+              <span class="text-white text-sm font-bold">{{
+                blog.author.name.charAt(0)
+              }}</span>
+            </div>
+            <div>
+              <span class="block text-sm font-medium text-white">{{
+                blog.author.name
+              }}</span>
+              <span class="block text-xs text-gray-400">Author</span>
+            </div>
+          </div>
+          <a
+            [routerLink]="['/blogs', blog.slug]"
+            class="relative inline-flex items-center gap-1 text-blue-400 font-medium text-sm group-hover:text-blue-300 transition-all duration-300 after:content-[''] after:absolute after:w-0 after:h-0.5 after:bg-blue-400 after:left-0 after:-bottom-0.5 group-hover:after:w-full after:transition-all after:duration-300"
+          >
+            Read more
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M14 5l7 7m0 0l-7 7m7-7H3"
+              />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
