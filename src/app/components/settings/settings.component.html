@@ -1,0 +1,901 @@
+<div class="min-h-screen bg-gray-950 text-white">
+  <!-- Header -->
+  <header class="border-b border-gray-800 py-4">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold">Account Settings</h1>
+      <a
+        routerLink="/home"
+        class="flex items-center text-blue-400 hover:text-blue-300"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 mr-1"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+          />
+        </svg>
+        Back to Home
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 py-6">
+    <!-- Loading Spinner -->
+    <div *ngIf="isLoading" class="flex justify-center py-12">
+      <div
+        class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"
+      ></div>
+    </div>
+
+    <div *ngIf="!isLoading" class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <!-- Sidebar Navigation -->
+      <div class="lg:col-span-1">
+        <div class="bg-gray-900 rounded-lg p-4 sticky top-4">
+          <!-- Profile Summary -->
+          <div class="flex flex-col items-center mb-6 p-4">
+            <div class="relative group">
+              <img
+                *ngIf="!imagePreview"
+                [src]="getUserAvatar()"
+                [alt]="user?.name || 'User'"
+                class="w-24 h-24 rounded-full object-cover border-2 border-blue-500"
+              />
+              <img
+                *ngIf="imagePreview"
+                [src]="imagePreview"
+                alt="Preview"
+                class="w-24 h-24 rounded-full object-cover border-2 border-blue-500"
+              />
+              <div
+                class="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+              >
+                <label
+                  for="profile-picture"
+                  class="cursor-pointer text-sm text-white"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-6 w-6 mx-auto"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  <span class="block text-center mt-1">Change</span>
+                </label>
+                <input
+                  type="file"
+                  id="profile-picture"
+                  (change)="onImageChange($event)"
+                  accept="image/*"
+                  class="hidden"
+                />
+              </div>
+            </div>
+            <h2 class="text-xl font-semibold mt-3">
+              {{ user?.name || userProfileForm.get("name")?.value || "User" }}
+            </h2>
+            <p class="text-gray-400 text-sm">
+              {{
+                user?.username ||
+                  userProfileForm.get("username")?.value ||
+                  "username"
+              }}
+            </p>
+
+            <button
+              *ngIf="selectedImage"
+              (click)="uploadProfilePicture()"
+              [disabled]="isSubmitting"
+              class="mt-3 text-sm bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded-md transition-colors"
+            >
+              <span *ngIf="isSubmitting">Uploading...</span>
+              <span *ngIf="!isSubmitting">Upload Photo</span>
+            </button>
+          </div>
+
+          <!-- Navigation Tabs -->
+          <nav>
+            <ul class="space-y-1">
+              <li>
+                <button
+                  (click)="setActiveTab('profile')"
+                  [ngClass]="{
+                    'bg-blue-600': activeTab === 'profile',
+                    'hover:bg-gray-800': activeTab !== 'profile'
+                  }"
+                  class="w-full text-left px-4 py-3 rounded-md transition-colors flex items-center"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5 mr-3"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                  Profile Information
+                </button>
+              </li>
+              <li>
+                <button
+                  (click)="setActiveTab('account')"
+                  [ngClass]="{
+                    'bg-blue-600': activeTab === 'account',
+                    'hover:bg-gray-800': activeTab !== 'account'
+                  }"
+                  class="w-full text-left px-4 py-3 rounded-md transition-colors flex items-center"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5 mr-3"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"
+                    />
+                  </svg>
+                  Account Details
+                </button>
+              </li>
+              <li>
+                <button
+                  (click)="setActiveTab('security')"
+                  [ngClass]="{
+                    'bg-blue-600': activeTab === 'security',
+                    'hover:bg-gray-800': activeTab !== 'security'
+                  }"
+                  class="w-full text-left px-4 py-3 rounded-md transition-colors flex items-center"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5 mr-3"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                    />
+                  </svg>
+                  Security
+                </button>
+              </li>
+              <li>
+                <button
+                  (click)="setActiveTab('social')"
+                  [ngClass]="{
+                    'bg-blue-600': activeTab === 'social',
+                    'hover:bg-gray-800': activeTab !== 'social'
+                  }"
+                  class="w-full text-left px-4 py-3 rounded-md transition-colors flex items-center"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5 mr-3"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
+                    />
+                  </svg>
+                  Social Profiles
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Content Area -->
+      <div class="lg:col-span-3">
+        <div class="bg-gray-900 rounded-lg p-6">
+          <!-- Success/Error Messages -->
+          <div
+            *ngIf="successMessage"
+            class="mb-4 p-3 bg-green-500 bg-opacity-20 border border-green-500 rounded-md text-green-400"
+          >
+            {{ successMessage }}
+          </div>
+          <div
+            *ngIf="errorMessage"
+            class="mb-4 p-3 bg-red-500 bg-opacity-20 border border-red-500 rounded-md text-red-400"
+          >
+            {{ errorMessage }}
+          </div>
+
+          <!-- Profile Tab -->
+          <div *ngIf="activeTab === 'profile'">
+            <h2 class="text-xl font-semibold mb-6">Profile Information</h2>
+
+            <form [formGroup]="userProfileForm" (ngSubmit)="saveProfile()">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- Username -->
+                <div>
+                  <label
+                    for="username"
+                    class="block text-sm font-medium text-gray-400 mb-1"
+                    >Username</label
+                  >
+                  <input
+                    type="text"
+                    id="username"
+                    formControlName="username"
+                    class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <div
+                    *ngIf="
+                      userProfileForm.get('username')?.invalid &&
+                      userProfileForm.get('username')?.touched
+                    "
+                    class="text-red-400 text-sm mt-1"
+                  >
+                    Username must be less than 30 characters.
+                  </div>
+                </div>
+
+                <!-- Name -->
+                <div>
+                  <label
+                    for="name"
+                    class="block text-sm font-medium text-gray-400 mb-1"
+                    >Full Name</label
+                  >
+                  <input
+                    type="text"
+                    id="name"
+                    formControlName="name"
+                    class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <!-- Date of Birth -->
+                <div>
+                  <label
+                    for="dob"
+                    class="block text-sm font-medium text-gray-400 mb-1"
+                    >Date of Birth</label
+                  >
+                  <input
+                    type="date"
+                    id="dob"
+                    formControlName="dob"
+                    class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <!-- Profession -->
+                <div>
+                  <label
+                    for="profession"
+                    class="block text-sm font-medium text-gray-400 mb-1"
+                    >Profession</label
+                  >
+                  <input
+                    type="text"
+                    id="profession"
+                    formControlName="profession"
+                    class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              <!-- Bio -->
+              <div class="mb-6">
+                <label
+                  for="bio"
+                  class="block text-sm font-medium text-gray-400 mb-1"
+                  >Bio</label
+                >
+                <textarea
+                  id="bio"
+                  formControlName="bio"
+                  rows="4"
+                  class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                ></textarea>
+                <div
+                  *ngIf="
+                    userProfileForm.get('bio')?.invalid &&
+                    userProfileForm.get('bio')?.touched
+                  "
+                  class="text-red-400 text-sm mt-1"
+                >
+                  Bio must be less than 500 characters.
+                </div>
+              </div>
+
+              <!-- Interests -->
+              <div class="mb-6">
+                <label
+                  for="interests"
+                  class="block text-sm font-medium text-gray-400 mb-1"
+                  >Interests (comma separated)</label
+                >
+                <input
+                  type="text"
+                  id="interests"
+                  formControlName="interests"
+                  class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="coding, hiking, photography"
+                />
+              </div>
+
+              <div class="flex justify-end">
+                <button
+                  type="submit"
+                  [disabled]="userProfileForm.invalid || isSubmitting"
+                  class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span *ngIf="isSubmitting">Saving...</span>
+                  <span *ngIf="!isSubmitting">Save Changes</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Account Tab -->
+          <div *ngIf="activeTab === 'account'">
+            <h2 class="text-xl font-semibold mb-6">Account Details</h2>
+
+            <form [formGroup]="userProfileForm" (ngSubmit)="saveProfile()">
+              <div formGroupName="contact">
+                <h3 class="text-lg font-medium text-gray-300 mb-4">
+                  Contact Information
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <!-- Phone -->
+                  <div>
+                    <label
+                      for="phone"
+                      class="block text-sm font-medium text-gray-400 mb-1"
+                      >Phone Number</label
+                    >
+                    <input
+                      type="tel"
+                      id="phone"
+                      formControlName="phone"
+                      class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <!-- Alternate Email -->
+                  <div>
+                    <label
+                      for="alternateEmail"
+                      class="block text-sm font-medium text-gray-400 mb-1"
+                      >Alternate Email</label
+                    >
+                    <input
+                      type="email"
+                      id="alternateEmail"
+                      formControlName="alternateEmail"
+                      class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <div
+                      *ngIf="
+                        userProfileForm.get('contact.alternateEmail')
+                          ?.invalid &&
+                        userProfileForm.get('contact.alternateEmail')?.touched
+                      "
+                      class="text-red-400 text-sm mt-1"
+                    >
+                      Please enter a valid email address.
+                    </div>
+                  </div>
+
+                  <!-- Website -->
+                  <div class="md:col-span-2">
+                    <label
+                      for="website"
+                      class="block text-sm font-medium text-gray-400 mb-1"
+                      >Website</label
+                    >
+                    <input
+                      type="url"
+                      id="website"
+                      formControlName="website"
+                      class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="https://example.com"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div formGroupName="address" class="mt-8">
+                <h3 class="text-lg font-medium text-gray-300 mb-4">Address</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <!-- Street -->
+                  <div class="md:col-span-2">
+                    <label
+                      for="street"
+                      class="block text-sm font-medium text-gray-400 mb-1"
+                      >Street Address</label
+                    >
+                    <input
+                      type="text"
+                      id="street"
+                      formControlName="street"
+                      class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <!-- City -->
+                  <div>
+                    <label
+                      for="city"
+                      class="block text-sm font-medium text-gray-400 mb-1"
+                      >City</label
+                    >
+                    <input
+                      type="text"
+                      id="city"
+                      formControlName="city"
+                      class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <!-- State/Province -->
+                  <div>
+                    <label
+                      for="state"
+                      class="block text-sm font-medium text-gray-400 mb-1"
+                      >State/Province</label
+                    >
+                    <input
+                      type="text"
+                      id="state"
+                      formControlName="state"
+                      class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <!-- Country -->
+                  <div>
+                    <label
+                      for="country"
+                      class="block text-sm font-medium text-gray-400 mb-1"
+                      >Country</label
+                    >
+                    <input
+                      type="text"
+                      id="country"
+                      formControlName="country"
+                      class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <!-- Postal Code -->
+                  <div>
+                    <label
+                      for="postalCode"
+                      class="block text-sm font-medium text-gray-400 mb-1"
+                      >Postal Code</label
+                    >
+                    <input
+                      type="text"
+                      id="postalCode"
+                      formControlName="postalCode"
+                      class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex justify-end mt-6">
+                <button
+                  type="submit"
+                  [disabled]="userProfileForm.invalid || isSubmitting"
+                  class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span *ngIf="isSubmitting">Saving...</span>
+                  <span *ngIf="!isSubmitting">Save Changes</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Security Tab -->
+          <div *ngIf="activeTab === 'security'">
+            <h2 class="text-xl font-semibold mb-6">Security Settings</h2>
+
+            <!-- Password Change Form -->
+            <div>
+              <h3 class="text-lg font-medium text-gray-300 mb-4">
+                Change Password
+              </h3>
+
+              <!-- Success/Error Messages -->
+              <div
+                *ngIf="passwordSuccessMessage"
+                class="mb-4 p-3 bg-green-500 bg-opacity-20 border border-green-500 rounded-md text-green-400"
+              >
+                {{ passwordSuccessMessage }}
+              </div>
+              <div
+                *ngIf="passwordErrorMessage"
+                class="mb-4 p-3 bg-red-500 bg-opacity-20 border border-red-500 rounded-md text-red-400"
+              >
+                {{ passwordErrorMessage }}
+              </div>
+
+              <form [formGroup]="passwordForm" (ngSubmit)="updatePassword()">
+                <div class="space-y-4 mb-6">
+                  <!-- Current Password -->
+                  <div>
+                    <label
+                      for="currentPassword"
+                      class="block text-sm font-medium text-gray-400 mb-1"
+                      >Current Password</label
+                    >
+                    <input
+                      type="password"
+                      id="currentPassword"
+                      formControlName="currentPassword"
+                      class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <div
+                      *ngIf="
+                        passwordForm.get('currentPassword')?.invalid &&
+                        passwordForm.get('currentPassword')?.touched
+                      "
+                      class="text-red-400 text-sm mt-1"
+                    >
+                      Current password is required.
+                    </div>
+                  </div>
+
+                  <!-- New Password -->
+                  <div>
+                    <label
+                      for="newPassword"
+                      class="block text-sm font-medium text-gray-400 mb-1"
+                      >New Password</label
+                    >
+                    <input
+                      type="password"
+                      id="newPassword"
+                      formControlName="newPassword"
+                      class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <div
+                      *ngIf="
+                        passwordForm.get('newPassword')?.invalid &&
+                        passwordForm.get('newPassword')?.touched
+                      "
+                      class="text-red-400 text-sm mt-1"
+                    >
+                      Password must be at least 6 characters.
+                    </div>
+                  </div>
+
+                  <!-- Confirm Password -->
+                  <div>
+                    <label
+                      for="confirmPassword"
+                      class="block text-sm font-medium text-gray-400 mb-1"
+                      >Confirm New Password</label
+                    >
+                    <input
+                      type="password"
+                      id="confirmPassword"
+                      formControlName="confirmPassword"
+                      class="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <div
+                      *ngIf="
+                        passwordForm.hasError('mismatch') &&
+                        passwordForm.get('confirmPassword')?.touched
+                      "
+                      class="text-red-400 text-sm mt-1"
+                    >
+                      Passwords do not match.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex justify-end">
+                  <button
+                    type="submit"
+                    [disabled]="passwordForm.invalid || isSubmitting"
+                    class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <span *ngIf="isSubmitting">Updating...</span>
+                    <span *ngIf="!isSubmitting">Update Password</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Security Options -->
+            <div class="mt-10">
+              <h3 class="text-lg font-medium text-gray-300 mb-4">
+                Security Options
+              </h3>
+
+              <div class="space-y-4">
+                <div
+                  class="flex items-center justify-between p-4 bg-gray-800 rounded-md"
+                >
+                  <div>
+                    <h4 class="font-medium">Two-Factor Authentication</h4>
+                    <p class="text-sm text-gray-400 mt-1">
+                      Add an extra layer of security to your account
+                    </p>
+                  </div>
+                  <button
+                    class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition-colors text-sm"
+                  >
+                    Enable
+                  </button>
+                </div>
+
+                <div
+                  class="flex items-center justify-between p-4 bg-gray-800 rounded-md"
+                >
+                  <div>
+                    <h4 class="font-medium">Active Sessions</h4>
+                    <p class="text-sm text-gray-400 mt-1">
+                      Manage your active login sessions
+                    </p>
+                  </div>
+                  <button
+                    class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-md transition-colors text-sm"
+                  >
+                    View
+                  </button>
+                </div>
+
+                <div
+                  class="flex items-center justify-between p-4 bg-gray-800 rounded-md"
+                >
+                  <div>
+                    <h4 class="font-medium">Login History</h4>
+                    <p class="text-sm text-gray-400 mt-1">
+                      View your recent login activity
+                    </p>
+                  </div>
+                  <button
+                    class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-md transition-colors text-sm"
+                  >
+                    View
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Social Tab -->
+          <div *ngIf="activeTab === 'social'">
+            <h2 class="text-xl font-semibold mb-6">Social Profiles</h2>
+
+            <form [formGroup]="userProfileForm" (ngSubmit)="saveProfile()">
+              <div formGroupName="social">
+                <div class="space-y-4 mb-6">
+                  <!-- GitHub -->
+                  <div
+                    class="flex items-center space-x-4 p-4 bg-gray-800 rounded-md"
+                  >
+                    <div
+                      class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-gray-700 rounded-full"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 w-6"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path
+                          d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+                        />
+                      </svg>
+                    </div>
+                    <div class="flex-grow">
+                      <label
+                        for="github"
+                        class="block text-sm font-medium text-gray-400 mb-1"
+                        >GitHub</label
+                      >
+                      <input
+                        type="text"
+                        id="github"
+                        formControlName="github"
+                        class="w-full bg-gray-700 border border-gray-600 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="username"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Twitter -->
+                  <div
+                    class="flex items-center space-x-4 p-4 bg-gray-800 rounded-md"
+                  >
+                    <div
+                      class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-gray-700 rounded-full"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 w-6"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path
+                          d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"
+                        />
+                      </svg>
+                    </div>
+                    <div class="flex-grow">
+                      <label
+                        for="twitter"
+                        class="block text-sm font-medium text-gray-400 mb-1"
+                        >Twitter</label
+                      >
+                      <input
+                        type="text"
+                        id="twitter"
+                        formControlName="twitter"
+                        class="w-full bg-gray-700 border border-gray-600 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="username"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- LinkedIn -->
+                  <div
+                    class="flex items-center space-x-4 p-4 bg-gray-800 rounded-md"
+                  >
+                    <div
+                      class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-gray-700 rounded-full"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 w-6"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path
+                          d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+                        />
+                      </svg>
+                    </div>
+                    <div class="flex-grow">
+                      <label
+                        for="linkedin"
+                        class="block text-sm font-medium text-gray-400 mb-1"
+                        >LinkedIn</label
+                      >
+                      <input
+                        type="text"
+                        id="linkedin"
+                        formControlName="linkedin"
+                        class="w-full bg-gray-700 border border-gray-600 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="username"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Facebook -->
+                  <div
+                    class="flex items-center space-x-4 p-4 bg-gray-800 rounded-md"
+                  >
+                    <div
+                      class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-gray-700 rounded-full"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 w-6"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path
+                          d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+                        />
+                      </svg>
+                    </div>
+                    <div class="flex-grow">
+                      <label
+                        for="facebook"
+                        class="block text-sm font-medium text-gray-400 mb-1"
+                        >Facebook</label
+                      >
+                      <input
+                        type="text"
+                        id="facebook"
+                        formControlName="facebook"
+                        class="w-full bg-gray-700 border border-gray-600 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="username"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Instagram -->
+                  <div
+                    class="flex items-center space-x-4 p-4 bg-gray-800 rounded-md"
+                  >
+                    <div
+                      class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-gray-700 rounded-full"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 w-6"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path
+                          d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"
+                        />
+                      </svg>
+                    </div>
+                    <div class="flex-grow">
+                      <label
+                        for="instagram"
+                        class="block text-sm font-medium text-gray-400 mb-1"
+                        >Instagram</label
+                      >
+                      <input
+                        type="text"
+                        id="instagram"
+                        formControlName="instagram"
+                        class="w-full bg-gray-700 border border-gray-600 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="username"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex justify-end mt-6">
+                <button
+                  type="submit"
+                  [disabled]="userProfileForm.invalid || isSubmitting"
+                  class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span *ngIf="isSubmitting">Saving...</span>
+                  <span *ngIf="!isSubmitting">Save Changes</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

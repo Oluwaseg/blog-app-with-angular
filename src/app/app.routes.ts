@@ -12,6 +12,7 @@ import { OAuthCallbackComponent } from './components/oauth-callback/oauth-callba
 import { RegisterComponent } from './components/register/register.component';
 import { RequestVerificationComponent } from './components/request-verification/request-verification.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
+import { SettingsComponent } from './components/settings/settings.component';
 import { VerifyEmailComponent } from './components/verify-email/verify-email.component';
 import { AuthGuard } from './guards/auth.guard';
 
@@ -27,6 +28,11 @@ export const routes: Routes = [
   {
     path: 'home',
     component: HomeComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'settings',
+    component: SettingsComponent,
     canActivate: [AuthGuard],
   },
   {

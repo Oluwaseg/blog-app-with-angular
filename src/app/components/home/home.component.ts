@@ -16,6 +16,7 @@ export class HomeComponent implements OnInit {
   blogs: Blog[] = [];
   isLoading = true;
   error: string | null = null;
+  timestamp = Date.now();
 
   suggestedUsers = [
     {
@@ -55,6 +56,7 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.authService.currentUser$.subscribe((user) => {
       this.user = user;
+      this.timestamp = Date.now();
     });
     this.loadBlogs();
   }
@@ -114,5 +116,19 @@ export class HomeComponent implements OnInit {
 
   getCurrentUserId(): string | undefined {
     return this.authService.getCurrentUserId();
+  }
+
+  getUserAvatar(): string {
+    if (this.user?.image) {
+      const baseUrl = this.user.image.split('?')[0];
+      return `${baseUrl}?_t=${this.timestamp}`;
+    }
+
+    if (this.user?.name) {
+      const name = encodeURIComponent(this.user.name);
+      return `https://ui-avatars.com/api/?name=${name}&background=0D8ABC&color=fff`;
+    }
+
+    return 'https://ui-avatars.com/api/?background=0D8ABC&color=fff';
   }
 }

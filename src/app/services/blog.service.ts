@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export interface Blog {
@@ -161,21 +160,10 @@ export class BlogService {
       formData.append('image', blogData.image);
     }
 
-    return this.http
-      .put<{ success: boolean; message: string; data: Blog }>(
-        `${this.apiUrl}/api/blogs/${slug}/edit`,
-        formData
-      )
-      .pipe(
-        tap({
-          next: (response) => {
-            console.log('Update successful:', response);
-          },
-          error: (error) => {
-            console.error('Update failed:', error);
-          },
-        })
-      );
+    return this.http.put<{ success: boolean; message: string; data: Blog }>(
+      `${this.apiUrl}/api/blogs/${slug}/edit`,
+      formData
+    );
   }
 
   deleteBlog(id: string): Observable<{ success: boolean; message: string }> {

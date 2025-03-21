@@ -66,9 +66,15 @@ export class LoginComponent {
           this.unverifiedEmail = this.loginForm.value.email;
           this.errorMessage =
             'Your email has not been verified. Please verify your email to continue.';
+        } else if (
+          error.message === 'Token or user missing in login response'
+        ) {
+          this.errorMessage =
+            'Login failed due to server error. Please try again or contact support.';
         } else {
           this.errorMessage =
             error.error?.message ||
+            error.message ||
             'Login failed. Please check your credentials.';
         }
       },
