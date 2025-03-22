@@ -380,39 +380,130 @@
             </div>
 
             <div *ngFor="let comment of blog.comments" class="mb-8 last:mb-0">
-              <!-- Comment -->
+              <!-- Comment Header (Always Visible) -->
               <div
                 class="bg-gray-800/30 rounded-xl p-6 transition-all duration-300 hover:bg-gray-800/50"
               >
-                <div class="flex items-start gap-4">
-                  <div
-                    *ngIf="comment.author.image"
-                    class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-gray-700"
-                  >
-                    <img
-                      [src]="comment.author.image"
-                      [alt]="comment.author.name"
-                      class="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div
-                    *ngIf="!comment.author.image"
-                    class="w-12 h-12 rounded-full bg-gradient-to-br from-gray-700 to-gray-600 flex items-center justify-center flex-shrink-0 ring-2 ring-gray-700"
-                  >
-                    <span
-                      class="text-white font-bold"
-                      *ngIf="comment?.author?.name"
-                      >{{ comment.author.name.charAt(0) }}</span
+                <div class="flex items-start justify-between">
+                  <div class="flex items-start gap-4">
+                    <div
+                      *ngIf="comment.author.image"
+                      class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-gray-700"
                     >
+                      <img
+                        [src]="comment.author.image"
+                        [alt]="comment.author.name"
+                        class="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div
+                      *ngIf="!comment.author.image"
+                      class="w-12 h-12 rounded-full bg-gradient-to-br from-gray-700 to-gray-600 flex items-center justify-center flex-shrink-0 ring-2 ring-gray-700"
+                    >
+                      <span
+                        class="text-white font-bold"
+                        *ngIf="comment?.author?.name"
+                        >{{ comment.author.name.charAt(0) }}</span
+                      >
+                    </div>
+
+                    <div>
+                      <div class="flex items-center mb-2">
+                        <h4 class="font-medium text-white">
+                          {{ comment.author.name }}
+                        </h4>
+                        <span
+                          class="text-sm text-gray-400 ml-2 flex items-center gap-1"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                          {{
+                            comment.formattedTime ||
+                              formatDate(comment.createdAt)
+                          }}
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
-                  <div class="flex-grow">
-                    <div class="flex items-center justify-between mb-2">
-                      <h4 class="font-medium text-white">
-                        {{ comment.author.name }}
-                      </h4>
-                      <span
-                        class="text-sm text-gray-400 flex items-center gap-1"
+                  <!-- Collapse/Expand Button -->
+                  <button
+                    (click)="toggleComment(comment._id)"
+                    class="text-gray-400 hover:text-blue-400 transition-colors duration-200"
+                  >
+                    <svg
+                      *ngIf="!collapsedComments.has(comment._id)"
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M5 15l7-7 7 7"
+                      />
+                    </svg>
+                    <svg
+                      *ngIf="collapsedComments.has(comment._id)"
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+                </div>
+
+                <!-- Comment Content (Collapsible) -->
+                <div *ngIf="!collapsedComments.has(comment._id)">
+                  <!-- Comment Content or Edit Form -->
+                  <div *ngIf="editingComment !== comment._id">
+                    <p class="text-gray-300 mb-4 mt-2">{{ comment.content }}</p>
+
+                    <!-- Comment Actions -->
+                    <div class="flex flex-wrap items-center gap-4">
+                      <button
+                        (click)="
+                          reactToComment(blog.slug, comment._id, 'likes')
+                        "
+                        class="flex items-center gap-1 text-sm px-3 py-1.5 rounded-full transition-all duration-300"
+                        [ngClass]="{
+                          'text-blue-400': comment.reactions.likes.includes(
+                            getCurrentUserId() || ''
+                          ),
+                          'bg-blue-900/30': comment.reactions.likes.includes(
+                            getCurrentUserId() || ''
+                          ),
+                          'text-gray-400': !comment.reactions.likes.includes(
+                            getCurrentUserId() || ''
+                          ),
+                          'hover:bg-gray-700':
+                            !comment.reactions.likes.includes(
+                              getCurrentUserId() || ''
+                            )
+                        }"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -425,102 +516,105 @@
                             stroke-linecap="round"
                             stroke-linejoin="round"
                             stroke-width="2"
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                            d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"
+                          />
+                        </svg>
+                        <span>{{ comment.reactions.likes.length }}</span>
+                      </button>
+
+                      <button
+                        (click)="
+                          reactToComment(blog.slug, comment._id, 'dislikes')
+                        "
+                        class="flex items-center gap-1 text-sm px-3 py-1.5 rounded-full transition-all duration-300"
+                        [ngClass]="{
+                          'text-red-400': comment.reactions.dislikes.includes(
+                            getCurrentUserId() || ''
+                          ),
+                          'bg-red-900/30': comment.reactions.dislikes.includes(
+                            getCurrentUserId() || ''
+                          ),
+                          'text-gray-400': !comment.reactions.dislikes.includes(
+                            getCurrentUserId() || ''
+                          ),
+                          'hover:bg-gray-700':
+                            !comment.reactions.dislikes.includes(
+                              getCurrentUserId() || ''
+                            )
+                        }"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.096c.5 0 .905-.405.905-.904 0-.715.211-1.413.608-2.008L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5"
+                          />
+                        </svg>
+                        <span>{{ comment.reactions.dislikes.length }}</span>
+                      </button>
+
+                      <button
+                        *ngIf="isAuthenticated"
+                        (click)="startReply(comment._id)"
+                        class="flex items-center gap-1 text-sm text-gray-400 hover:text-blue-400 px-3 py-1.5 rounded-full hover:bg-gray-700 transition-all duration-300"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
+                          />
+                        </svg>
+                        Reply
+                      </button>
+
+                      <!-- Toggle Replies Button -->
+                      <button
+                        *ngIf="comment.replies && comment.replies.length > 0"
+                        (click)="toggleReplies(comment._id)"
+                        class="flex items-center gap-1 text-sm text-gray-400 hover:text-blue-400 px-3 py-1.5 rounded-full hover:bg-gray-700 transition-all duration-300"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 9l-7 7-7-7"
                           />
                         </svg>
                         {{
-                          comment.formattedTime || formatDate(comment.createdAt)
+                          collapsedReplies.has(comment._id) ? "Show" : "Hide"
                         }}
-                      </span>
-                    </div>
+                        {{ comment.replies.length }}
+                        {{ comment.replies.length === 1 ? "reply" : "replies" }}
+                      </button>
 
-                    <!-- Comment Content (normal or editing mode) -->
-                    <div *ngIf="editingComment !== comment._id">
-                      <p class="text-gray-300 mb-4">{{ comment.content }}</p>
-
-                      <!-- Comment Actions -->
-                      <div class="flex flex-wrap items-center gap-4">
+                      <div
+                        *ngIf="isCommentOwner(comment)"
+                        class="ml-auto flex gap-2"
+                      >
                         <button
-                          (click)="
-                            reactToComment(blog.slug, comment._id, 'likes')
-                          "
-                          class="flex items-center gap-1 text-sm px-3 py-1.5 rounded-full transition-all duration-300"
-                          [ngClass]="{
-                            'text-blue-400': comment.reactions.likes.includes(
-                              getCurrentUserId() || ''
-                            ),
-                            'bg-blue-900/30': comment.reactions.likes.includes(
-                              getCurrentUserId() || ''
-                            ),
-                            'text-gray-400': !comment.reactions.likes.includes(
-                              getCurrentUserId() || ''
-                            ),
-                            'hover:bg-gray-700':
-                              !comment.reactions.likes.includes(
-                                getCurrentUserId() || ''
-                              )
-                          }"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="h-4 w-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"
-                            />
-                          </svg>
-                          <span>{{ comment.reactions.likes.length }}</span>
-                        </button>
-
-                        <button
-                          (click)="
-                            reactToComment(blog.slug, comment._id, 'dislikes')
-                          "
-                          class="flex items-center gap-1 text-sm px-3 py-1.5 rounded-full transition-all duration-300"
-                          [ngClass]="{
-                            'text-red-400': comment.reactions.dislikes.includes(
-                              getCurrentUserId() || ''
-                            ),
-                            'bg-red-900/30':
-                              comment.reactions.dislikes.includes(
-                                getCurrentUserId() || ''
-                              ),
-                            'text-gray-400':
-                              !comment.reactions.dislikes.includes(
-                                getCurrentUserId() || ''
-                              ),
-                            'hover:bg-gray-700':
-                              !comment.reactions.dislikes.includes(
-                                getCurrentUserId() || ''
-                              )
-                          }"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="h-4 w-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.096c.5 0 .905-.405.905-.904 0-.715.211-1.413.608-2.008L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5"
-                            />
-                          </svg>
-                          <span>{{ comment.reactions.dislikes.length }}</span>
-                        </button>
-
-                        <button
-                          *ngIf="isAuthenticated"
-                          (click)="startReply(comment._id)"
+                          (click)="startEditComment(comment)"
                           class="flex items-center gap-1 text-sm text-gray-400 hover:text-blue-400 px-3 py-1.5 rounded-full hover:bg-gray-700 transition-all duration-300"
                         >
                           <svg
@@ -534,106 +628,15 @@
                               stroke-linecap="round"
                               stroke-linejoin="round"
                               stroke-width="2"
-                              d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
+                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                             />
                           </svg>
-                          Reply
-                        </button>
-
-                        <div
-                          *ngIf="isCommentOwner(comment)"
-                          class="ml-auto flex gap-2"
-                        >
-                          <button
-                            (click)="startEditComment(comment)"
-                            class="flex items-center gap-1 text-sm text-gray-400 hover:text-blue-400 px-3 py-1.5 rounded-full hover:bg-gray-700 transition-all duration-300"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              class="h-4 w-4"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                              />
-                            </svg>
-                            Edit
-                          </button>
-                          <button
-                            *ngIf="isCommentOwner(comment) || isOwner"
-                            (click)="deleteComment(comment._id)"
-                            class="flex items-center gap-1 text-sm text-gray-400 hover:text-red-400 px-3 py-1.5 rounded-full hover:bg-gray-700 transition-all duration-300"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              class="h-4 w-4"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                              />
-                            </svg>
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Edit Comment Form -->
-                    <div *ngIf="editingComment === comment._id" class="mt-2">
-                      <textarea
-                        [(ngModel)]="editContent"
-                        rows="3"
-                        class="w-full px-4 py-3 text-white bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                      ></textarea>
-                      <div class="flex justify-end gap-2 mt-3">
-                        <button
-                          (click)="cancelEditComment()"
-                          class="px-4 py-2 text-sm text-gray-300 hover:text-white bg-gray-700 hover:bg-gray-600 rounded-lg transition-all duration-300"
-                        >
-                          Cancel
+                          Edit
                         </button>
                         <button
-                          (click)="updateComment(comment._id)"
-                          class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300"
-                        >
-                          Update
-                        </button>
-                      </div>
-                    </div>
-
-                    <!-- Reply Form -->
-                    <div
-                      *ngIf="replyContent[comment._id] !== undefined"
-                      class="mt-4 bg-gray-800/50 p-4 rounded-lg"
-                    >
-                      <textarea
-                        [(ngModel)]="replyContent[comment._id]"
-                        rows="3"
-                        class="w-full px-4 py-3 text-white bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                        placeholder="Write your reply..."
-                      ></textarea>
-                      <div class="flex justify-end gap-2 mt-3">
-                        <button
-                          (click)="cancelReply(comment._id)"
-                          class="px-4 py-2 text-sm text-gray-300 hover:text-white bg-gray-700 hover:bg-gray-600 rounded-lg transition-all duration-300"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          (click)="submitReply(comment._id)"
-                          [disabled]="!replyContent[comment._id].trim()"
-                          class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                          *ngIf="isCommentOwner(comment) || isOwner"
+                          (click)="deleteComment(comment._id)"
+                          class="flex items-center gap-1 text-sm text-gray-400 hover:text-red-400 px-3 py-1.5 rounded-full hover:bg-gray-700 transition-all duration-300"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -646,21 +649,94 @@
                               stroke-linecap="round"
                               stroke-linejoin="round"
                               stroke-width="2"
-                              d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                             />
                           </svg>
-                          Reply
+                          Delete
                         </button>
                       </div>
                     </div>
+                  </div>
 
-                    <!-- Replies -->
-                    <div
-                      *ngIf="comment.replies && comment.replies.length > 0"
-                      class="mt-5 pl-4 border-l-2 border-gray-700 space-y-4"
+                  <!-- Edit Comment Form -->
+                  <div *ngIf="editingComment === comment._id" class="mt-2">
+                    <textarea
+                      [(ngModel)]="editContent"
+                      rows="3"
+                      class="w-full px-4 py-3 text-white bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    ></textarea>
+                    <div class="flex justify-end gap-2 mt-3">
+                      <button
+                        (click)="cancelEditComment()"
+                        class="px-4 py-2 text-sm text-gray-300 hover:text-white bg-gray-700 hover:bg-gray-600 rounded-lg transition-all duration-300"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        (click)="updateComment(comment._id)"
+                        class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300"
+                      >
+                        Update
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Reply Form -->
+                  <div
+                    *ngIf="replyContent[comment._id] !== undefined"
+                    class="mt-4 bg-gray-800/50 p-4 rounded-lg"
+                  >
+                    <textarea
+                      [(ngModel)]="replyContent[comment._id]"
+                      rows="3"
+                      class="w-full px-4 py-3 text-white bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                      placeholder="Write your reply..."
+                    ></textarea>
+                    <div class="flex justify-end gap-2 mt-3">
+                      <button
+                        (click)="cancelReply(comment._id)"
+                        class="px-4 py-2 text-sm text-gray-300 hover:text-white bg-gray-700 hover:bg-gray-600 rounded-lg transition-all duration-300"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        (click)="submitReply(comment._id)"
+                        [disabled]="!replyContent[comment._id].trim()"
+                        class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
+                          />
+                        </svg>
+                        Reply
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Replies Section -->
+                  <div
+                    *ngIf="
+                      comment.replies &&
+                      comment.replies.length > 0 &&
+                      !collapsedReplies.has(comment._id)
+                    "
+                    class="mt-5 pl-4 border-l-2 border-gray-700 space-y-4"
+                  >
+                    <!-- Parent Replies (Direct replies to comments) -->
+                    <ng-container
+                      *ngFor="let reply of getParentReplies(comment.replies)"
                     >
                       <div
-                        *ngFor="let reply of comment.replies"
                         class="bg-gray-800/20 rounded-lg p-4 transition-all duration-300 hover:bg-gray-800/40"
                       >
                         <div class="flex items-start gap-3">
@@ -721,6 +797,8 @@
                                 {{ reply.content }}
                               </p>
                             </div>
+
+                            <!-- Edit reply form -->
                             <div
                               *ngIf="editingReplyId === reply._id"
                               class="mt-2"
@@ -881,7 +959,7 @@
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </ng-container>
                   </div>
                 </div>
               </div>

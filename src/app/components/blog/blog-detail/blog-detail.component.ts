@@ -27,6 +27,10 @@ export class BlogDetailComponent implements OnInit {
   editContent = '';
   relatedBlogs: Blog[] = [];
 
+  // Properties for collapsed comments
+  collapsedComments: Set<string> = new Set();
+  collapsedReplies: Set<string> = new Set();
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -494,5 +498,28 @@ export class BlogDetailComponent implements OnInit {
   isCommentOwner(comment: Comment): boolean {
     const currentUserId = this.getCurrentUserId();
     return currentUserId ? comment.author._id === currentUserId : false;
+  }
+
+  // Toggle comment collapse
+  toggleComment(commentId: string): void {
+    if (this.collapsedComments.has(commentId)) {
+      this.collapsedComments.delete(commentId);
+    } else {
+      this.collapsedComments.add(commentId);
+    }
+  }
+
+  // Toggle replies collapse
+  toggleReplies(commentId: string): void {
+    if (this.collapsedReplies.has(commentId)) {
+      this.collapsedReplies.delete(commentId);
+    } else {
+      this.collapsedReplies.add(commentId);
+    }
+  }
+
+  // Get parent replies (direct replies to comments)
+  getParentReplies(replies: Comment[]): Comment[] {
+    return replies; // All replies are parent replies now
   }
 }

@@ -1,6 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { environment } from '../../../environments/environment';
+import { Blog, BlogResponse } from '../../services/blog.service';
 
 @Component({
   selector: 'app-landing',
@@ -9,37 +12,113 @@ import { RouterLink } from '@angular/router';
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.scss'],
 })
-export class LandingComponent {
-  featuredPosts = [
-    {
-      id: 1,
-      title: 'Getting Started with Angular',
-      excerpt:
-        'Learn the basics of Angular and how to create your first application.',
-      imageUrl: 'https://via.placeholder.com/600x400',
-      date: 'March 15, 2025',
-      views: 1024,
-      category: 'Angular',
-    },
-    {
-      id: 2,
-      title: 'Mastering Tailwind CSS',
-      excerpt:
-        'Discover how to use Tailwind CSS to create beautiful, responsive designs.',
-      imageUrl: 'https://via.placeholder.com/600x400',
-      date: 'March 10, 2025',
-      views: 356,
-      category: 'CSS',
-    },
-    {
-      id: 3,
-      title: 'Web Development Trends 2025',
-      excerpt:
-        'Explore the latest trends in web development and what to expect in the coming year.',
-      imageUrl: 'https://via.placeholder.com/600x400',
-      date: 'March 5, 2025',
-      views: 512,
-      category: 'Web Development',
-    },
-  ];
+export class LandingComponent implements OnInit {
+  featuredPosts: Blog[] = [];
+  loading = true;
+  private apiUrl = environment.apiUrl;
+
+  constructor(private http: HttpClient) {}
+
+  ngOnInit(): void {
+    this.loadGuestBlogs();
+  }
+
+  loadGuestBlogs(): void {
+    // Create custom headers for the request to bypass the auth interceptor
+    const headers = new HttpHeaders({
+      'x-skip-interceptor': 'true',
+    });
+
+    this.http
+      .get<BlogResponse>(`${this.apiUrl}/api/blogs/guest`, { headers })
+      .subscribe({
+        next: (response) => {
+          this.featuredPosts = response.data.blogs.slice(0, 3);
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('Error fetching guest blogs:', error);
+          // Fallback to hardcoded data if the API call fails
+          this.loadHardcodedBlogs();
+        },
+      });
+  }
+
+  loadHardcodedBlogs(): void {
+    // Simulate loading
+    setTimeout(() => {
+      this.featuredPosts = [
+        {
+          _id: '1',
+          title: 'Getting Started with Angular',
+          slug: 'getting-started-with-angular',
+          description:
+            'Learn the basics of Angular and how to create your first application.',
+          content: '',
+          author: {
+            _id: '1',
+            name: 'John Doe',
+            username: 'johndoe',
+            image: 'https://via.placeholder.com/50',
+          },
+          createdAt: new Date().toISOString(),
+          comments: [],
+          reactions: {
+            likes: ['user1', 'user2', 'user3'],
+            dislikes: [],
+          },
+          image: 'https://via.placeholder.com/600x400',
+          category: 'Angular',
+          tags: ['Angular', 'Web Development', 'JavaScript'],
+        },
+        {
+          _id: '2',
+          title: 'Mastering TypeScript',
+          slug: 'mastering-typescript',
+          description:
+            'Discover how to use TypeScript to build scalable and maintainable applications.',
+          content: '',
+          author: {
+            _id: '2',
+            name: 'Jane Smith',
+            username: 'janesmith',
+            image: 'https://via.placeholder.com/50',
+          },
+          createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+          comments: [],
+          reactions: {
+            likes: ['user1', 'user4'],
+            dislikes: [],
+          },
+          image: 'https://via.placeholder.com/600x400',
+          category: 'TypeScript',
+          tags: ['TypeScript', 'JavaScript', 'Programming'],
+        },
+        {
+          _id: '3',
+          title: 'Modern Web Development Techniques',
+          slug: 'modern-web-development-techniques',
+          description:
+            'Explore the latest trends and technologies in web development.',
+          content: '',
+          author: {
+            _id: '3',
+            name: 'Alex Johnson',
+            username: 'alexj',
+            image: 'https://via.placeholder.com/50',
+          },
+          createdAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+          comments: [],
+          reactions: {
+            likes: ['user2', 'user3', 'user4', 'user5'],
+            dislikes: ['user6'],
+          },
+          image: 'https://via.placeholder.com/600x400',
+          category: 'Web Development',
+          tags: ['Web Development', 'Frontend', 'Backend'],
+        },
+      ];
+      this.loading = false;
+    }, 500);
+  }
 }

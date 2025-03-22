@@ -38,18 +38,21 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.loadUserFromLocalStorage();
     this.subscribeToAuthChanges();
 
-    // Run outside Angular zone to avoid ExpressionChangedAfterItHasBeenCheckedError
-    this.ngZone.runOutsideAngular(() => {
-      setTimeout(() => {
-        // Force fetch user profile on init to ensure fresh data
-        this.ngZone.run(() => {
-          this.authService.getUserProfile().subscribe({
-            next: () => this.cdr.detectChanges(),
-            error: () => {},
+    // Only fetch user profile if already authenticated from local storage
+    if (this.isAuthenticated) {
+      // Run outside Angular zone to avoid ExpressionChangedAfterItHasBeenCheckedError
+      this.ngZone.runOutsideAngular(() => {
+        setTimeout(() => {
+          // Force fetch user profile on init to ensure fresh data
+          this.ngZone.run(() => {
+            this.authService.getUserProfile().subscribe({
+              next: () => this.cdr.detectChanges(),
+              error: () => {},
+            });
           });
-        });
-      }, 0);
-    });
+        }, 0);
+      });
+    }
   }
 
   ngOnDestroy(): void {

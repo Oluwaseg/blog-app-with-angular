@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { AboutComponent } from './components/about/about.component';
 import { BlogCategoryComponent } from './components/blog/blog-category/blog-category.component';
 import { BlogCreateComponent } from './components/blog/blog-create/blog-create.component';
 import { BlogDetailComponent } from './components/blog/blog-detail/blog-detail.component';
@@ -68,6 +69,10 @@ export const routes: Routes = [
     path: 'blogs/:slug/edit',
     component: BlogEditComponent,
     canActivate: [AuthGuard],
+  },
+  {
+    path: 'about',
+    component: AboutComponent,
   },
   { path: '**', redirectTo: '' },
 ];

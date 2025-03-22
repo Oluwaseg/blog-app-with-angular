@@ -18,6 +18,15 @@ const removeAuthToken = (): void => {
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
 
+  // Skip if the request has the skip interceptor header
+  if (req.headers.has('x-skip-interceptor')) {
+    // Clone the request without the custom header to avoid sending it to the server
+    const cleanReq = req.clone({
+      headers: req.headers.delete('x-skip-interceptor'),
+    });
+    return next(cleanReq);
+  }
+
   // Get token directly from localStorage instead of through AuthService
   const token = getAuthToken();
 

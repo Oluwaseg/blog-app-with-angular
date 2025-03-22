@@ -1,0 +1,73 @@
+/* Comment transition animations */
+.comment-content-enter-active,
+.comment-content-leave-active {
+  transition: all 0.3s ease;
+  max-height: 1000px;
+  overflow: hidden;
+}
+
+.comment-content-enter-from,
+.comment-content-leave-to {
+  max-height: 0;
+  opacity: 0;
+  margin: 0;
+  padding: 0;
+}
+
+/* Nested reply styling */
+.nested-reply-area {
+  margin-left: 1rem;
+  position: relative;
+}
+
+.nested-reply-area::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: rgba(75, 85, 99, 0.5);
+}
+
+/* Hover effects for comments/replies */
+.reply-hover:hover {
+  background-color: rgba(31, 41, 55, 0.6);
+}
+
+.comment-hover:hover {
+  background-color: rgba(31, 41, 55, 0.5);
+}
+
+/* Improve readability for nested content */
+.nested-content {
+  font-size: 0.925rem;
+}
+
+.double-nested-content {
+  font-size: 0.875rem;
+}
+
+/* Add a subtle background to indicate thread depth */
+.reply-thread-level-1 {
+  background-color: rgba(31, 41, 55, 0.3);
+}
+
+.reply-thread-level-2 {
+  background-color: rgba(31, 41, 55, 0.2);
+}
+
+/* Collapse/expand transitions */
+.collapse-toggle {
+  transition: transform 0.2s ease;
+}
+
+.collapse-toggle.collapsed {
+  transform: rotate(180deg);
+}
+
+/* Collapsed state styles */
+.collapsed-comment {
+  max-height: 60px;
+  overflow: hidden;
+}

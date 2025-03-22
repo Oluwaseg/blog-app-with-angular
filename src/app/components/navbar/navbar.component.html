@@ -16,14 +16,15 @@
 
         <!-- Desktop Navigation Links -->
         <div class="hidden md:ml-10 md:flex md:space-x-8">
-          <!-- <a
-            routerLink="/"
-            routerLinkActive="text-blue-400 border-blue-400"
-            [routerLinkActiveOptions]="{ exact: true }"
-            class="border-transparent text-gray-300 hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors duration-200"
-          >
-            Home
-          </a> -->
+          <ng-container *ngIf="isAuthenticated">
+            <a
+              routerLink="/home"
+              routerLinkActive="text-blue-400 border-blue-400"
+              class="border-transparent text-gray-300 hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors duration-200"
+            >
+              Dashboard
+            </a>
+          </ng-container>
 
           <a
             routerLink="/blogs"
@@ -48,16 +49,6 @@
           >
             About
           </a>
-
-          <ng-container *ngIf="isAuthenticated">
-            <a
-              routerLink="/home"
-              routerLinkActive="text-blue-400 border-blue-400"
-              class="border-transparent text-gray-300 hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors duration-200"
-            >
-              Dashboard
-            </a>
-          </ng-container>
         </div>
       </div>
 
@@ -287,31 +278,32 @@
         </div>
 
         <nav class="mt-5 px-2 space-y-1">
-          <a
-            routerLink="/"
-            routerLinkActive="bg-gray-800 text-white"
-            [routerLinkActiveOptions]="{ exact: true }"
-            class="group flex items-center px-4 py-3 text-base font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="mr-4 h-5 w-5 text-gray-400 group-hover:text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+          <ng-container *ngIf="isAuthenticated">
+            <a
+              routerLink="/home"
+              routerLinkActive="bg-gray-800 text-white"
+              class="group flex items-center px-4 py-3 text-base font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-              />
-            </svg>
-            Home
-          </a>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="mr-4 h-5 w-5 text-gray-400 group-hover:text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                />
+              </svg>
+              Dashboard
+            </a>
+          </ng-container>
 
           <a
-            routerLink="/blog"
+            routerLink="/blogs"
             routerLinkActive="bg-gray-800 text-white"
             class="group flex items-center px-4 py-3 text-base font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200"
           >
@@ -333,7 +325,7 @@
           </a>
 
           <a
-            routerLink="/categories"
+            routerLink="/blogs/category"
             routerLinkActive="bg-gray-800 text-white"
             class="group flex items-center px-4 py-3 text-base font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200"
           >
@@ -377,28 +369,6 @@
           </a>
 
           <ng-container *ngIf="isAuthenticated">
-            <a
-              routerLink="/dashboard"
-              routerLinkActive="bg-gray-800 text-white"
-              class="group flex items-center px-4 py-3 text-base font-medium rounded-md text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="mr-4 h-5 w-5 text-gray-400 group-hover:text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
-                />
-              </svg>
-              Dashboard
-            </a>
-
             <a
               routerLink="/profile"
               routerLinkActive="bg-gray-800 text-white"
