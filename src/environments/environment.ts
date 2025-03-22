@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3050',
+  apiUrl: 'https://blog-api-2b6s.onrender.com',
 };
