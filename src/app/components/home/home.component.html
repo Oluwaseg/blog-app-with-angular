@@ -17,16 +17,30 @@
           <div
             class="flex justify-between w-full mb-6 bg-gray-800 rounded-lg p-4"
           >
-            <div class="text-center">
-              <p class="font-bold text-blue-400">120</p>
+            <div
+              class="text-center cursor-pointer hover:bg-gray-700 px-2 py-1 rounded-lg transition duration-200"
+            >
+              <p class="font-bold text-blue-400">
+                {{ loadingCounts ? "..." : postsCount }}
+              </p>
               <p class="text-gray-400 text-sm">Posts</p>
             </div>
-            <div class="text-center">
-              <p class="font-bold text-blue-400">1.5k</p>
+            <div
+              class="text-center cursor-pointer hover:bg-gray-700 px-3 py-1 rounded-lg transition duration-200"
+              routerLink="/profile/followers"
+            >
+              <p class="font-bold text-blue-400">
+                {{ loadingCounts ? "..." : followersCount }}
+              </p>
               <p class="text-gray-400 text-sm">Followers</p>
             </div>
-            <div class="text-center">
-              <p class="font-bold text-blue-400">350</p>
+            <div
+              class="text-center cursor-pointer hover:bg-gray-700 px-3 py-1 rounded-lg transition duration-200"
+              routerLink="/profile/following"
+            >
+              <p class="font-bold text-blue-400">
+                {{ loadingCounts ? "..." : followingCount }}
+              </p>
               <p class="text-gray-400 text-sm">Following</p>
             </div>
           </div>
@@ -348,23 +362,92 @@
     <div class="lg:col-span-3">
       <div class="bg-gray-900 rounded-lg shadow-lg p-6 sticky top-4">
         <h3 class="font-bold text-white mb-4">Suggested Users</h3>
+
+        <!-- Loading state for suggestions -->
+        <div
+          *ngIf="loadingSuggestions"
+          class="flex justify-center items-center py-4"
+        >
+          <div
+            class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-400"
+          ></div>
+        </div>
+
+        <!-- No suggestions message -->
+        <div
+          *ngIf="!loadingSuggestions && suggestedUsers.length === 0"
+          class="text-gray-400 py-4 text-center"
+        >
+          No suggestions available at this time.
+        </div>
+
+        <!-- Suggestions list -->
         <div class="space-y-4">
           <div
             *ngFor="let user of suggestedUsers"
-            class="flex items-center justify-between"
+            class="flex items-center justify-between relative"
           >
-            <div class="flex items-center space-x-3">
-              <img
-                [src]="user.image"
-                [alt]="user.name"
-                class="w-10 h-10 rounded-full border-2 border-gray-800"
-              />
-              <div>
+            <div class="flex items-center">
+              <div class="relative group">
+                <img
+                  [src]="getUserImage(user.image, user.name)"
+                  [alt]="user.name"
+                  class="w-10 h-10 rounded-full border-2 border-gray-800 cursor-pointer"
+                  onerror="this.src='https://ui-avatars.com/api/?background=0D8ABC&color=fff'"
+                />
+
+                <!-- Hover Card - only shows when hovering -->
+                <div
+                  class="absolute left-0 bottom-full mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-10 hover-card"
+                >
+                  <div
+                    class="bg-gray-800 rounded-lg p-4 shadow-lg border border-gray-700 w-64"
+                  >
+                    <div class="flex items-center gap-3 mb-3">
+                      <img
+                        [src]="getUserImage(user.image, user.name)"
+                        [alt]="user.name"
+                        class="w-14 h-14 rounded-full border-2 border-gray-700"
+                        onerror="this.src='https://ui-avatars.com/api/?background=0D8ABC&color=fff'"
+                      />
+                      <div>
+                        <h4 class="font-semibold text-white text-lg">
+                          {{ user.name }}
+                        </h4>
+                        <p class="text-gray-400 text-sm">
+                          {{ user.username ? "@" + user.username : "@user" }}
+                        </p>
+                      </div>
+                    </div>
+                    <p *ngIf="user.bio" class="text-gray-300 text-sm mb-3">
+                      {{ user.bio }}
+                    </p>
+                    <div
+                      class="flex justify-between text-sm text-gray-400 border-t border-gray-700 pt-3"
+                    >
+                      <div class="text-center">
+                        <p class="font-semibold text-blue-400">
+                          {{ user.blogCount }}
+                        </p>
+                        <p class="text-xs">Posts</p>
+                      </div>
+                      <button
+                        (click)="followUser(user._id)"
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-1.5 text-sm transition duration-200"
+                      >
+                        Follow
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="ml-3">
                 <p class="font-medium text-white">{{ user.name }}</p>
-                <p class="text-gray-400 text-sm">{{ user.posts }} posts</p>
+                <p class="text-gray-400 text-sm">{{ user.blogCount }} posts</p>
               </div>
             </div>
             <button
+              (click)="followUser(user._id)"
               class="text-blue-400 hover:text-blue-300 font-medium hover:underline"
             >
               Follow
@@ -372,78 +455,95 @@
           </div>
         </div>
         <div class="mt-6 pt-6 border-t border-gray-800">
-          <h3 class="font-bold text-white mb-4">Recent Activity</h3>
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="font-bold text-white">Recent Activity</h3>
+            <button
+              *ngIf="unreadActivitiesCount > 0"
+              (click)="markActivitiesAsRead()"
+              class="text-xs text-blue-400 hover:text-blue-300"
+            >
+              Mark all as read
+            </button>
+          </div>
+
+          <!-- Loading state for activities -->
+          <div
+            *ngIf="loadingActivities"
+            class="flex justify-center items-center py-4"
+          >
+            <div
+              class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-400"
+            ></div>
+          </div>
+
+          <!-- No activities message -->
+          <div
+            *ngIf="!loadingActivities && activities.length === 0"
+            class="text-gray-400 py-4 text-center"
+          >
+            No recent activity to show.
+          </div>
+
+          <!-- Activities list -->
           <div class="space-y-4">
-            <div class="flex items-start space-x-3">
-              <div class="bg-gray-800 p-2 rounded-full">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5 text-blue-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"
-                  />
-                </svg>
-              </div>
+            <div
+              *ngFor="let activity of activities"
+              class="flex items-start space-x-3 relative rounded-lg p-2 transition duration-200"
+              [class.bg-gray-800]="!activity.read"
+              [class.bg-opacity-50]="!activity.read"
+            >
+              <div
+                *ngIf="!activity.read"
+                class="absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full"
+              ></div>
+
+              <div
+                class="bg-gray-800 p-2 rounded-full"
+                [innerHTML]="getActivityIcon(activity.type)"
+              ></div>
+
               <div>
-                <p class="text-sm text-white">Alice Johnson liked your post</p>
-                <p class="text-xs text-gray-400">2 hours ago</p>
-              </div>
-            </div>
-            <div class="flex items-start space-x-3">
-              <div class="bg-gray-800 p-2 rounded-full">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5 text-green-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+                <div class="flex items-center gap-2">
+                  <img
+                    [src]="
+                      getUserImage(activity.user?.image, activity.user?.name)
+                    "
+                    [alt]="activity.user?.name || 'User'"
+                    class="w-5 h-5 rounded-full"
+                    onerror="this.src='https://ui-avatars.com/api/?background=0D8ABC&color=fff'"
                   />
-                </svg>
-              </div>
-              <div>
-                <p class="text-sm text-white">
-                  Bob Smith commented on your post
+                  <p class="text-sm text-white">
+                    <span class="font-medium">{{ activity.user?.name }}</span>
+                    {{ activity.message }}
+                    <span
+                      *ngIf="
+                        activity.entityType === 'blog' && activity.entityId
+                      "
+                    >
+                      <a
+                        [routerLink]="['/blogs', activity.entityId]"
+                        class="text-blue-400 hover:underline"
+                      >
+                        {{ getEntityTitle(activity) }}
+                      </a>
+                    </span>
+                  </p>
+                </div>
+                <p class="text-xs text-gray-400">
+                  {{ getTimeAgo(activity.createdAt) }}
                 </p>
-                <p class="text-xs text-gray-400">5 hours ago</p>
               </div>
             </div>
-            <div class="flex items-start space-x-3">
-              <div class="bg-gray-800 p-2 rounded-full">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5 text-purple-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p class="text-sm text-white">
-                  Carol Davis started following you
-                </p>
-                <p class="text-xs text-gray-400">1 day ago</p>
-              </div>
-            </div>
+          </div>
+
+          <!-- View all button -->
+          <div *ngIf="activities.length > 0" class="mt-4 text-center">
+            <a
+              routerLink="/activities"
+              class="text-blue-400 hover:text-blue-300 text-sm"
+            >
+              View all activities
+            </a>
           </div>
         </div>
       </div>

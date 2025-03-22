@@ -9,6 +9,8 @@ import { HomeComponent } from './components/home/home.component';
 import { LandingComponent } from './components/landing/landing.component';
 import { LoginComponent } from './components/login/login.component';
 import { OAuthCallbackComponent } from './components/oauth-callback/oauth-callback.component';
+import { FollowersComponent } from './components/profile/followers/followers.component';
+import { FollowingComponent } from './components/profile/following/following.component';
 import { RegisterComponent } from './components/register/register.component';
 import { RequestVerificationComponent } from './components/request-verification/request-verification.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
@@ -33,6 +35,16 @@ export const routes: Routes = [
   {
     path: 'settings',
     component: SettingsComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'profile/followers',
+    component: FollowersComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'profile/following',
+    component: FollowingComponent,
     canActivate: [AuthGuard],
   },
   {

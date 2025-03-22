@@ -325,4 +325,11 @@ export class BlogService {
       `${this.apiUrl}/api/blogs/${slug}/comment/${commentId}/edit-reply/${replyId}`
     );
   }
+
+  /**
+   * Get blogs authored by the current user
+   */
+  getUserBlogs(): Observable<BlogResponse> {
+    return this.http.get<BlogResponse>(`${this.apiUrl}/api/social/user/blogs`);
+  }
 }

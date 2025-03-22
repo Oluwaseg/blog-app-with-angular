@@ -1,0 +1,114 @@
+<div class="container mx-auto px-4 py-8 bg-gray-950 text-white min-h-screen">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8 flex flex-col sm:flex-row justify-between items-center">
+      <div>
+        <h1 class="text-3xl font-bold text-white mb-2">Following</h1>
+        <p class="text-gray-400">People you follow</p>
+      </div>
+      <div class="mt-4 sm:mt-0">
+        <a
+          routerLink="/home"
+          class="text-blue-400 hover:text-blue-300 flex items-center"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 mr-1"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          Back to Home
+        </a>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex justify-center items-center py-20">
+      <div
+        class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-400"
+      ></div>
+    </div>
+
+    <!-- Error State -->
+    <div
+      *ngIf="error"
+      class="bg-red-900 border border-red-800 text-red-200 px-4 py-3 rounded-lg mb-6"
+    >
+      {{ error }}
+    </div>
+
+    <!-- No Following State -->
+    <div
+      *ngIf="!isLoading && following.length === 0 && !error"
+      class="text-center py-16 bg-gray-900 rounded-lg"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-16 w-16 mx-auto text-gray-600 mb-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+        />
+      </svg>
+      <h3 class="text-xl font-medium text-white mb-2">
+        You're Not Following Anyone Yet
+      </h3>
+      <p class="text-gray-400 max-w-md mx-auto">
+        When you follow people, they'll appear here. Check out the suggestions
+        to find people to follow!
+      </p>
+      <a
+        routerLink="/home"
+        class="inline-block mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition duration-200"
+      >
+        Find People to Follow
+      </a>
+    </div>
+
+    <!-- Following List -->
+    <div *ngIf="!isLoading && following.length > 0" class="grid gap-4">
+      <div
+        *ngFor="let user of following"
+        class="bg-gray-900 rounded-lg p-4 flex items-center justify-between"
+      >
+        <div class="flex items-center">
+          <img
+            [src]="getUserImage(user.image, user.name)"
+            [alt]="user.name"
+            class="w-12 h-12 rounded-full border-2 border-gray-800 mr-4"
+            onerror="this.src='https://ui-avatars.com/api/?background=0D8ABC&color=fff'"
+          />
+          <div>
+            <h3 class="font-medium text-white">{{ user.name }}</h3>
+            <p *ngIf="user.bio" class="text-gray-400 text-sm line-clamp-1">
+              {{ user.bio }}
+            </p>
+            <p *ngIf="!user.bio" class="text-gray-500 text-sm">
+              {{ user.username ? "@" + user.username : "@user" }}
+            </p>
+          </div>
+        </div>
+        <div>
+          <button
+            (click)="unfollowUser(user._id)"
+            class="bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded-lg text-sm transition duration-200"
+          >
+            Following
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

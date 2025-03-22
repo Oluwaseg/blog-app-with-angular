@@ -1,0 +1,71 @@
+/* Hover Card Styles */
+.group {
+  position: relative;
+}
+
+.hover-card {
+  transition: opacity 0.3s ease 0.1s, visibility 0.3s ease 0.1s,
+    transform 0.3s ease 0.1s;
+  transform: translateY(10px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  pointer-events: none; /* Prevent flickering */
+}
+
+.group:hover .hover-card {
+  transform: translateY(0);
+  pointer-events: auto; /* Allow interactions when visible */
+}
+
+/* Ensure the hover card doesn't get cut off on the right edge */
+.hover-card {
+  @media (max-width: 1200px) {
+    left: auto;
+    right: 0;
+  }
+
+  /* On small screens, position it better */
+  @media (max-width: 640px) {
+    left: -50px;
+    right: auto;
+  }
+}
+
+/* Add a subtle animation to the follow button in the hover card */
+.hover-card button {
+  transition: all 0.2s ease;
+}
+
+.hover-card button:hover {
+  transform: translateY(-1px);
+}
+
+/* Activity styles */
+.bg-gray-800.bg-opacity-50 {
+  background-color: rgba(31, 41, 55, 0.5);
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: rgba(31, 41, 55, 0.8);
+  }
+}
+
+.absolute.top-2.right-2 {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+  }
+
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 5px rgba(59, 130, 246, 0);
+  }
+
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
